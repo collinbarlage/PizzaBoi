@@ -77,3 +77,7 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+*.tlog
+PizzaBoi/Debug/vc110.idb
+*.lastbuildstate
+*.psess
