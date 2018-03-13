@@ -82,3 +82,6 @@ PizzaBoi/Debug/vc110.idb
 *.lastbuildstate
 *.psess
 PizzaBoi.opensdf
+
+# Visual Studio Binaries
+.vs/
