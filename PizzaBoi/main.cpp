@@ -10,11 +10,28 @@
 void init(void);
 void display(void);
 void keyboard(unsigned char, int, int);
-void arrows(int key, int x, int y);
+void keyboardup(unsigned char, int, int);
+void specialInput(int key, int x, int y);
+void specialInputUp(int key, int x, int y);
 void click(int button, int state, int x, int y);
 void resize(int width, int height);
 void close(void);
 void timerCallback(int value);
+
+//helper functions
+void toggleKey(unsigned char key, bool toggle);
+void toggleSpecialInput(int key, bool toggle);
+void animateKeys();
+
+struct Key{
+	char key;
+	bool pressed;
+};
+
+struct SpecialInput{
+	int key;
+	bool pressed;
+};
 
 
 //Objects
@@ -22,6 +39,7 @@ Polyhedron* mbox;
 Sphere* sphere;
 Camera cam1 = Camera(vec4(0,2,-2,1), vec4(0,1,0,1));
 Camera cam2 = Camera(vec4(0,10,0,1), vec4(0,0,-1,1));
+Camera *cam = &cam1;
 vector<Drawable*>drawables;
 
 //Lights
@@ -37,6 +55,22 @@ bool stoneSelect = false;
 mat4 getCameraMatrix();
 vec4 getCameraEye();
 GLuint windowID=0;
+
+//Put any keys here that you want to be animated when held down
+enum E_Keys {z=0, Z, xKey, X, c, C, KEYS_SIZE}; //make sure KEYS_SIZE is always last element in enum
+Key keys[] = {{'z', false},
+              {'Z', false},
+              {'x', false},
+              {'X', false},
+              {'c', false},
+              {'C', false}};
+
+//Put any special inputs here that you want to be animated when held down
+enum E_SInputs {Up=0, Down, Left, Right, SINPUTS_SIZE}; //make sure SINPUTS_SIZE is always last element in enum
+SpecialInput sInputs[] = {{GLUT_KEY_UP, false},
+						  {GLUT_KEY_DOWN, false},
+						  {GLUT_KEY_LEFT, false},
+						  {GLUT_KEY_RIGHT, false}};
 
 
 //----------------------------------------------------------------------------
@@ -69,7 +103,9 @@ int main(int argc, char **argv)
 	glutDisplayFunc(display);
 	glutWMCloseFunc(close);
 	glutKeyboardFunc(keyboard);  //What to do if a keyboard event is detected
-	glutSpecialFunc(arrows);
+	glutKeyboardUpFunc(keyboardup);  //What to do if a keyboard event is detected
+	glutSpecialFunc(specialInput);
+	glutSpecialUpFunc(specialInputUp);
 	glutMouseFunc(click);
 
 	//start the main event listening loop
@@ -128,7 +164,7 @@ void display( void )
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	//cout << lights[0]->position << endl;
 	for (unsigned int i = 0; i < drawables.size(); i++)
-		drawables[i]->draw(cam1, lights);
+		drawables[i]->draw(Camera(*cam), lights);
 	glutSwapBuffers();
 }
 
@@ -138,49 +174,6 @@ void resize(int w, int h) {
 	glViewport(0, 0, (GLsizei)w, (GLsizei)h);  //make the viewport the entire window
 }
 
-void keyboard(unsigned char key, int x, int y)
-{
-	switch (key) {
-	case 033:  // Escape key
-	case 'q': case 'Q':
-		close();
-		break;
-	case 'z': 
-		cam1.rotate(0,0,-1);
-		break;
-	case 'Z': 
-		cam1.rotate(0,0,1);
-		break;
-	case 'c': 
-		cam1.rotate(0,-1,0);
-		break;
-	case 'C': 
-		cam1.rotate(0,1,0);
-		break;
-	case 'x': 
-		cam1.rotate(-1,0,0);
-		break;
-	case 'X': 
-		cam1.rotate(1,0,0);
-		break;
-	case ' ': 
-		//Flashlight toggle
-		flashlight.on = !flashlight.isOn(); //toggle
-		break;
-	case 'p': case 'P':
-		cam1.toggleProj();
-		break;
-	case 't': case 'T':
-		if(stoneSelect) {
-			drawables[1]->makeTexture("bloc.ppm");
-		} else {
-			drawables[1]->makeTexture("stone.ppm");
-		}
-		stoneSelect = !stoneSelect; //toggle
-		break;
-	}
-	display();
-}
 
 void click(int button, int state, int x, int y) {
 	float xp, yp;
@@ -196,40 +189,64 @@ void click(int button, int state, int x, int y) {
 		vec4 rayWorld = pWorld - getCameraEye();
 
 		drawables[1]->pick(rayWorld, getCameraEye());
-		display();
+		// display();
 	}	
 }
 
-void arrows(int key, int x, int y) {
-	switch (key) {
-	case GLUT_KEY_LEFT:
-		cam1.move(-.1,0,0);
-		flashlight.move(.1,0,0);
-		break;
+void keyboard(unsigned char key, int x, int y)
+{
+	//put keys here that aren't meant to be held down / animated
+	if(key == 'q' || key == 'Q') close();
+	if (key == 'p' || key == 'P') cam->toggleProj();
+	// if (key == ' ') camToggle = !camToggle;
 
-	case GLUT_KEY_RIGHT:
-		cam1.move(.1,0,0);
-		flashlight.move(-.1,0,0);
-		break;
-
-	case GLUT_KEY_UP:
-		cam1.move(0,0,-.1);
-		flashlight.move(0,0,.1);
-		break;
-
-	case GLUT_KEY_DOWN:
-		cam1.move(0,0,.1);
-		flashlight.move(0,0,-.1);
-		break;
-	}
-	glutPostRedisplay();
-	display();
+	toggleKey(key, true);
 }
+
+void keyboardup(unsigned char key, int x, int y)
+{
+	if (key == 'q' || key == 'Q') close();
+	
+	toggleKey(key, false);
+}
+
+//Toggles key pressed on/off 
+void toggleKey(unsigned char key, bool toggle){
+	for (unsigned int i = 0; i < KEYS_SIZE; i++) {
+		if (key == keys[i].key) {
+			keys[i].pressed = toggle; 
+			break; 
+		}
+	}
+}
+
+void specialInput(int key, int x, int y) {
+	toggleSpecialInput(key, true);
+}
+
+void specialInputUp(int key, int x, int y) {
+	toggleSpecialInput(key, false);
+}
+
+//Toggles special key pressed on/off 
+void toggleSpecialInput(int key, bool toggle){
+	for (unsigned int i = 0; i < SINPUTS_SIZE; i++) {
+		if (key == sInputs[i].key) {
+			sInputs[i].pressed = toggle; 
+			break; 
+		}
+	}
+};
+
+
 
 //----------------------------------------------------------------------------
 //Timer  callback
 void timerCallback(int value) {
 	vec4 pos = sun.position;
+
+	animateKeys();
+
 	//Rotate sun
 	orbitTime += .002;
 	if(orbitTime >= 3.1415926535) 
@@ -239,6 +256,33 @@ void timerCallback(int value) {
 	//continue animating
 	glutTimerFunc(10, timerCallback, 0);
 	glutPostRedisplay();
+}
+
+//Holds all keys and their animations. Meant for the timerCallback function
+void animateKeys() {
+	if (keys[z].pressed)  			cam->rotate(0, 0, -1);
+	if (keys[Z].pressed)  			cam->rotate(0, 0, 1);
+	if (keys[c].pressed)  			cam->rotate(0, -1, 0);
+	if (keys[C].pressed)  			cam->rotate(0, 1, 0);
+	if (keys[xKey].pressed)  		cam->rotate(-1, 0, 0);
+	if (keys[X].pressed)  			cam->rotate(1, 0, 0);
+
+	if (sInputs[Up].pressed) {
+		cam->move(0, 0, -.05);
+		flashlight.move(0, 0, .05);
+	}
+	if (sInputs[Down].pressed) {
+		cam->move(0, 0, .05);
+		flashlight.move(0, 0, -.05);
+	}
+	if (sInputs[Left].pressed) {
+		cam->move(-.05, 0, 0);
+		flashlight.move(.05, 0, 0);
+	}
+	if (sInputs[Right].pressed) {
+		cam->move(.05, 0, 0);
+		flashlight.move(-.05, 0, 0);
+	}
 }
 
 void close(){
@@ -252,17 +296,9 @@ void close(){
 }
 
 mat4 getCameraMatrix(){
-	if(camSelect) {
-		return cam2.cameraMatrix;
-	} else {
-		return cam1.cameraMatrix;
-	}
+	return cam->cameraMatrix;
 }
 
 vec4 getCameraEye(){
-	if(camSelect) {
-		return cam2.eye;
-	} else {
-		return cam1.eye;
-	}
+	return cam->eye;
 }
