@@ -12,13 +12,59 @@ Polyhedron::Polyhedron(vec4 d, vec4 s, vec4 a) {
 	ambi = a;
 }
 
-void Polyhedron::init(char * textureName) {
+void Polyhedron::init() {
+	index = 0;
+	//buildCube();
+
+	//get buffers for attributes and indices
+	glGenBuffers(1, &VBO);
+	assert((program = InitShader("vshader_basic.glsl", "fshader_basic.glsl")) != -1);
+	glUseProgram(program);  //make it the active one
+
+	//get vData
+	assert((vPosition = glGetAttribLocation(program, "vPosition")) != -1);
+	assert((vNormal = glGetAttribLocation(program, "vNormal")) != -1);
+
+
+	//get light location
+	diffuse_loc = glGetUniformLocation(program, "matDiffuse");
+	spec_loc = glGetUniformLocation(program, "matSpecular");
+	ambient_loc = glGetUniformLocation(program, "matAmbient");
+	alpha_loc = glGetUniformLocation(program, "matAlpha");
+
+	//get the location of the model matrix
+	assert((mmLoc = glGetUniformLocation(program, "model_matrix")) != -1);
+	assert((cmLoc = glGetUniformLocation(program, "camera_matrix")) != -1);
+	assert((pmLoc = glGetUniformLocation(program, "proj_matrix")) != -1);
+
+	cout << "NORMAL SIZE: " << normals.size() << "\n";
+	cout << "POINTS SIZE: " << points.size() << "\n";
+
+	//put the data on the VBO
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(points)*points.size() * 2, NULL, GL_STATIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(points)*points.size(), &points[0]);
+	glBufferSubData(GL_ARRAY_BUFFER, sizeof(points)*points.size(), sizeof(points)*points.size(), &normals[0]);
+
+	//set up stuff for the body of the Polyhedron
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO); //make this VAO active
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);  //associate the VBO with the active VAO
+
+	glEnableVertexAttribArray(vPosition);  //enable it
+	glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+
+	glEnableVertexAttribArray(vNormal);
+	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(sizeof(points)*points.size()));
+}
+
+void Polyhedron::textureInit(char * textureName) {
 	index = 0;
 	//buildCube();
 	
 	//get buffers for attributes and indices
 	glGenBuffers(1, &VBO);
-	assert((program = InitShader("vshader_poly.glsl", "fshader_poly.glsl"))!=-1);
+	assert((program = InitShader("vshader_texture.glsl", "fshader_texture.glsl"))!=-1);
 	glUseProgram(program);  //make it the active one
 	
 	//get vData
@@ -204,6 +250,52 @@ void Polyhedron::loadSmf(string filename) {
 		}
 		calcNormals();
 	}
+}
+
+void Polyhedron::loadObj(string filename, float scale) {
+	//load file 
+	ifstream infile(filename.c_str());
+	string fin;
+	int count = 1;
+	//read
+	while (getline(infile, fin)) {
+
+		istringstream iss(fin);
+		//split line
+		vector<string> tokens;
+		copy(istream_iterator<string>(iss),
+			istream_iterator<string>(),
+			back_inserter(tokens));
+		if (tokens.size() > 0 && !tokens[0].compare("v")) {
+			vertices.push_back(vec4(stof(tokens[1]) * scale, stof(tokens[2]) * scale, stof(tokens[3]) * scale, 1));
+		}
+		else if (tokens.size() > 0 && !tokens[0].compare("f")) {
+
+			int f1;
+			int f2;
+			int f3;
+
+			if (tokens[1].find("/") != std::string::npos) {
+				f1 = stoi(tokens[1].substr(0, tokens[1].find("/")))-1;
+				points.push_back(vertices[f1]);
+			} else points.push_back(vertices[stoi(tokens[1]) - 1]);
+
+			if (tokens[2].find("/") != std::string::npos) {
+				f2 = stoi(tokens[2].substr(0, tokens[2].find("/")))-1;
+				points.push_back(vertices[f2]);
+			}
+			else points.push_back(vertices[stoi(tokens[2]) - 1]);
+
+			if (tokens[3].find("/") != std::string::npos) {
+				f3 = stoi(tokens[3].substr(0, tokens[3].find("/")))-1;
+				points.push_back(vertices[f3]);
+			}
+			else points.push_back(vertices[stoi(tokens[3]) - 1]);
+			
+		}
+		count++;
+	}
+	calcNormals();
 }
 
 vec4 Polyhedron::randomColor() {

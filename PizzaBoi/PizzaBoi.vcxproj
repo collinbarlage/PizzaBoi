@@ -23,9 +23,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="fshader00_v150.glsl" />
-    <None Include="fshader_poly.glsl" />
+    <None Include="fshader_basic.glsl" />
+    <None Include="fshader_texture.glsl" />
     <None Include="vshader00_v150.glsl" />
-    <None Include="vshader_poly.glsl" />
+    <None Include="vshader_basic.glsl" />
+    <None Include="vshader_texture.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />

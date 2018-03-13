@@ -36,6 +36,7 @@ struct SpecialInput{
 
 //Objects
 Polyhedron* mbox;
+Polyhedron* object;
 Sphere* sphere;
 Camera cam1 = Camera(vec4(0,2,-2,1), vec4(0,1,0,1));
 Camera cam2 = Camera(vec4(0,10,0,1), vec4(0,0,-1,1));
@@ -129,28 +130,37 @@ void init()
 	sphere = new Sphere(64,vec4(5.0, 0.794, 0.886,1),vec4(0.1, 0.694, 0.986,1),vec4(0.0, 0.1, 0.2,1));
 	sphere->setModelMatrix(Translate(1,-.4,1));
 	sphere->init();
-	drawables.push_back(sphere);
+	//drawables.push_back(sphere);
 
 	//cube
 	mbox = new Polyhedron();
 	mbox->loadSmf("cube");
 	mbox->setModelMatrix(Translate(-1,-.4,-1));
-	mbox->init("bloc.ppm");
-	drawables.push_back(mbox);
+	mbox->textureInit("bloc.ppm");
+	//drawables.push_back(mbox);
 
 	//floor plane
 	mbox = new Polyhedron();
 	mbox->loadSmf("cube");
 	//mbox->setModelMatrix(Translate(-1,-.4,-1));
 	mbox->setModelMatrix(Translate(0,-1.5,0)*Scale(15.0,0.1,15.0));
-	mbox->init("grass.ppm");
+	mbox->textureInit("grass.ppm");
 	drawables.push_back(mbox);
+
+	//object
+	object = new Polyhedron();
+	object->loadObj("totem.obj", 1);
+	object->setModelMatrix(Translate(-2, -.5, 1));
+	object->init();
+	//object->setModelMatrix(Translate(0, 0, 0));
+	drawables.push_back(object);
+
 
 	//skybox
 	mbox = new Polyhedron();
 	mbox->loadSmf("cube");
 	mbox->setModelMatrix(Translate(0,0,0)*Scale(50.0,50.0,50.0));
-	mbox->init("sky.ppm");
+	mbox->textureInit("sky.ppm");
 	drawables.push_back(mbox);
 	
 	//orbit sun
@@ -198,6 +208,7 @@ void keyboard(unsigned char key, int x, int y)
 	//put keys here that aren't meant to be held down / animated
 	if(key == 'q' || key == 'Q') close();
 	if (key == 'p' || key == 'P') cam->toggleProj();
+	if (key == ' ') cam = &cam2;
 	// if (key == ' ') camToggle = !camToggle;
 
 	toggleKey(key, true);

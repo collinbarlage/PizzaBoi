@@ -50,10 +50,16 @@
     <None Include="vshader00_v150.glsl">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="fshader_poly.glsl">
+    <None Include="fshader_texture.glsl">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="vshader_poly.glsl">
+    <None Include="vshader_texture.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="fshader_basic.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="vshader_basic.glsl">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
