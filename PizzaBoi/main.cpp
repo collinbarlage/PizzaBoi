@@ -40,7 +40,7 @@ Polyhedron* object;
 Sphere* sphere;
 Camera cam1 = Camera(vec4(0,2,-2,1), vec4(0,0,0,1), vec4(0,1,0,1));
 Camera cam2 = Camera(vec4(0,-10,0,1), vec4(1,-10,0,1), vec4(0,1,0,1));
-Camera *cam = &cam1;
+Camera *cam = &cam2;
 vector<Drawable*>drawables;
 
 //Lights
@@ -51,7 +51,7 @@ float orbitTime = 0;
 
 
 //Helpers
-bool camSelect = false;
+bool isAtMainMenu = true;
 bool stoneSelect = false;
 mat4 getCameraMatrix();
 vec4 getCameraEye();
@@ -126,18 +126,19 @@ void init()
 	flashlight.on = 0; //initilize flashlight to be off
 	lights.push_back(&flashlight);
 
+	//main menu
+	mbox = new Polyhedron();
+	mbox->loadObj("mainMenu.obj", 1);
+	mbox->setModelMatrix(Translate(2,-10,0)*Scale(1.5,1.5,1.5)*RotateY(90));
+	//mbox->textureInit("pizzaBoiMainMenu.ppm");
+	mbox->textureInit("pizzaBoiMainMenu.ppm");
+	drawables.push_back(mbox);
+
 	//sphere
 	sphere = new Sphere(64,vec4(5.0, 0.794, 0.886,1),vec4(0.1, 0.694, 0.986,1),vec4(0.0, 0.1, 0.2,1));
 	sphere->setModelMatrix(Translate(1,-.4,1));
 	sphere->init();
 	//drawables.push_back(sphere);
-
-	cube
-	mbox = new Polyhedron();
-	mbox->loadObj("mainMenuScreen.obj",.1);
-	//mbox->setModelMatrix(Translate(2,-10,0)*Scale(1,1.8,3.2));
-	mbox->textureInit("pizzaBoiMainMenu.ppm");
-	drawables.push_back(mbox);
 
 	//floor plane
 	mbox = new Polyhedron();
@@ -186,20 +187,13 @@ void resize(int w, int h) {
 
 
 void click(int button, int state, int x, int y) {
-	float xp, yp;
-
-	if(state == 0) {
-		//cout << "CLICKED at " << x << ", " << y << endl;
-		xp = (2*float(x)/512)-1;
-		yp = 1-(2*float(y)/512);
-		//cout << "xp = " << xp << "yp = " << yp << endl;
-		vec4 pFront = vec4(xp, yp, -1, 1);
-		vec4 pCam = inverse(getCameraMatrix())*pFront;
-		vec4 pWorld = inverse(getCameraMatrix())*pCam;
-		vec4 rayWorld = pWorld - getCameraEye();
-
-		drawables[1]->pick(rayWorld, getCameraEye());
-		// display();
+	if(isAtMainMenu && state == 0 && x >440 && x < 889 && y > 443 && y < 690) {
+		isAtMainMenu = false;
+		cam = &cam1;
+		drawables[0]->makeTexture("pizzaBoiDeath.ppm");
+		//START GAME
+		
+		display();
 	}	
 }
 
@@ -208,9 +202,10 @@ void keyboard(unsigned char key, int x, int y)
 	//put keys here that aren't meant to be held down / animated
 	if(key == 'q' || key == 'Q') close();
 	if (key == 'p' || key == 'P') cam->toggleProj();
-	if (key == ' ') cam = &cam2;
-	// if (key == ' ') camToggle = !camToggle;
-
+	if (key == ' ') {
+		isAtMainMenu = true;
+		cam = &cam2;
+	}
 	toggleKey(key, true);
 }
 
