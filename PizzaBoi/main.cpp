@@ -131,7 +131,7 @@ void init()
 	mbox = new Polyhedron();
 	mbox->loadObj("mainMenu.obj", 1);
 	mbox->setModelMatrix(Translate(2,-10,0)*Scale(1.5,1.5,1.5)*RotateY(90));
-	mbox->textureInit("pizzaBoiMainMenu.ppm");
+	mbox->textureInit("pizzaBoiMainMenu.ppm", 1280, 720);
 	drawables.push_back(mbox);
 
 	//sphere
@@ -144,7 +144,7 @@ void init()
 	mbox = new Polyhedron();
 	mbox->loadSmf("cube");
 	mbox->setModelMatrix(Translate(0,-1.5,0)*Scale(15.0,0.1,15.0));
-	mbox->textureInit("grass.ppm");
+	mbox->textureInit("grass.ppm", 1280, 720);
 	drawables.push_back(mbox);
 	
 	//pizza
@@ -165,7 +165,7 @@ void init()
 	mbox = new Polyhedron();
 	mbox->loadSmf("cube");
 	mbox->setModelMatrix(Translate(0,0,0)*Scale(50.0,50.0,50.0));
-	mbox->textureInit("sky.ppm");
+	mbox->textureInit("sky.ppm", 1280, 720);
 	drawables.push_back(mbox);
 	
 	//orbit sun
@@ -194,7 +194,7 @@ void click(int button, int state, int x, int y) {
 	if(isAtMainMenu && state == 0 && x >440 && x < 889 && y > 443 && y < 690) {
 		isAtMainMenu = false;
 		cam = &cam1;
-		drawables[0]->makeTexture("pizzaBoiDeath.ppm");
+		drawables[0]->makeTexture("pizzaBoiDeath.ppm", 1280, 720);
 		//START GAME
 		
 		display();

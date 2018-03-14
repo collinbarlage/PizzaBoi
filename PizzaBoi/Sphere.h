@@ -25,7 +25,7 @@ public:
 	void addVert(vec4 v, vec4 c);
 	void draw(Camera, vector<Light*>);
 	void pick(vec4 probe, vec4 eye);
-	virtual void makeTexture(char * n);
+	virtual void makeTexture(char * n, int width, int height);
 	void makeWireframe();
 
 private:

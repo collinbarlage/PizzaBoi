@@ -24,7 +24,7 @@ public:
 	~Object();
 
 	void draw(Camera, vector<Light*>);
-	void makeTexture(char * name);
+	void makeTexture(char * name, int width, int height);
 
 private:
 	Polyhedron * poly;

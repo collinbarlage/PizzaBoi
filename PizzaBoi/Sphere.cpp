@@ -191,6 +191,6 @@ vec4 Sphere::norm(vec4 p) {
 	return t;
 }
 
-void Sphere::makeTexture(char * n){
+void Sphere::makeTexture(char * n,int width, int height){
 	//null
 }

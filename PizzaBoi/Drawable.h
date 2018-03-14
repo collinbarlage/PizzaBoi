@@ -17,7 +17,7 @@ protected:
 
 public:
 	virtual void draw(Camera, vector<Light*>)=0;
-	virtual void makeTexture(char * n)=0;
+	virtual void makeTexture(char * n, int width, int height)=0;
 	void setModelMatrix(mat4 mm) { modelmatrix *= mm; }
 	static unsigned char* ppmRead(char* filename, int* width, int* height);
 	~Drawable();

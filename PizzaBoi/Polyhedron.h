@@ -26,7 +26,7 @@ public:
 	Polyhedron(vector<vec4> verts);
 
 	void init();
-	void textureInit(char * textureName);
+	void textureInit(char * name, int width, int height);
 	void addVert(vec4 v);
 	void addVert(vec4 v, vec4 c);
 	void draw(Camera, vector<Light*>);
@@ -38,7 +38,7 @@ private:
 	void buildPolyhedron();
 	void buildCube();
 	void calcNormals();
-	void makeTexture(char * name);
+	void makeTexture(char * name, int width, int height);
 	void makeQuad(GLuint a, GLuint b, GLuint c, GLuint d);
 	GLuint vPosition;
 	GLuint vColor;

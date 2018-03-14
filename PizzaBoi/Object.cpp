@@ -29,21 +29,21 @@ void Object::draw(Camera cam, vector<Light*> lights){
 void Object::makePizza() {
 	poly = new Polyhedron();
 	poly->loadObj("./objects/pizzaPie.obj", 1);
-	poly->textureInit("./objects/pizzaPep.ppm");
+	poly->textureInit("./objects/pizzaPep.ppm", 1, 1);
 	polyhedrons.push_back(poly);
 
 	poly = new Polyhedron();
 	poly->loadObj("./objects/pizzaCrust.obj", 1);
-	poly->textureInit("./objects/pizzaCrust.ppm");
+	poly->textureInit("./objects/pizzaCrust.ppm", 1280, 720);
 	polyhedrons.push_back(poly);
 
 	poly = new Polyhedron();
 	poly->loadObj("./objects/pizzaDough.obj", 1);
-	poly->textureInit("./objects/pizzaCrust.ppm");
+	poly->textureInit("./objects/pizzaCrust.ppm", 1280, 720);
 	polyhedrons.push_back(poly);
 }
 
-void Object::makeTexture(char * name) {
+void Object::makeTexture(char * name, int width, int height) {
 	//abstract
 }
 
