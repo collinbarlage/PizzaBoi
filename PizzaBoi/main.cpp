@@ -147,13 +147,13 @@ void init()
 	mbox->textureInit("grass.ppm");
 	drawables.push_back(mbox);
 
-	//object
-	// object = new Polyhedron();
-	// object->loadObj("bound-cow.obj", 1);
-	// object->setModelMatrix(Translate(-2, -.5, 1));
-	// object->init();
-	// //object->setModelMatrix(Translate(0, 0, 0));
-	// drawables.push_back(object);
+	object
+	object = new Polyhedron();
+	object->loadObj("totem.obj", 1);
+	object->setModelMatrix(Translate(-2, -.5, 1));
+	object->init();
+	object->setModelMatrix(Translate(0, 0, 0));
+	drawables.push_back(object);
 
 
 	//skybox
