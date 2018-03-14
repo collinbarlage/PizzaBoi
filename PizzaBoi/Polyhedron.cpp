@@ -268,34 +268,35 @@ void Polyhedron::loadObj(string filename, float scale) {
 			back_inserter(tokens));
 		if (tokens.size() > 0 && !tokens[0].compare("v")) {
 			vertices.push_back(vec4(stof(tokens[1]) * scale, stof(tokens[2]) * scale, stof(tokens[3]) * scale, 1));
-		}
-		else if (tokens.size() > 0 && !tokens[0].compare("f")) {
+		} else if (tokens.size() > 0 && !tokens[0].compare("vn")) {
+			normalVerts.push_back(vec3(stof(tokens[1]), stof(tokens[2]), stof(tokens[3])));
+		} else if (tokens.size() > 0 && !tokens[0].compare("vt")) {
+			textureVerts.push_back(vec2(stof(tokens[1]), stof(tokens[2])));
+		} else if (tokens.size() > 0 && !tokens[0].compare("f")) {
 
-			int f1;
-			int f2;
-			int f3;
+			int f[3];
+			int t[3];
+			int n[3];
 
-			if (tokens[1].find("/") != std::string::npos) {
-				f1 = stoi(tokens[1].substr(0, tokens[1].find("/")))-1;
-				points.push_back(vertices[f1]);
-			} else points.push_back(vertices[stoi(tokens[1]) - 1]);
-
-			if (tokens[2].find("/") != std::string::npos) {
-				f2 = stoi(tokens[2].substr(0, tokens[2].find("/")))-1;
-				points.push_back(vertices[f2]);
+			for(int i=0; i<3; i++) {
+				if (tokens[i+1].find("/") != std::string::npos) {
+					//point
+					f[i] = stoi(tokens[i+1].substr(0, tokens[i+1].find("/")))-1;
+					points.push_back(vertices[f[i]]);
+					tokens[i+1] = tokens[i+1].substr(tokens[i+1].find("/")+1);
+					//texture
+					t[i] = stoi(tokens[i+1].substr(0, tokens[i+1].find("/")))-1;
+					textureCoords.push_back(vec2(textureVerts[t[i]].x,-1* textureVerts[t[i]].y));
+					tokens[i+1] = tokens[i+1].substr(tokens[i+1].find("/")+1);
+					//normal
+					n[i] = stoi(tokens[i+1])-1;
+					normals.push_back(normalVerts[n[i]]);
+				} else points.push_back(vertices[stoi(tokens[i+1]) - 1]);
 			}
-			else points.push_back(vertices[stoi(tokens[2]) - 1]);
-
-			if (tokens[3].find("/") != std::string::npos) {
-				f3 = stoi(tokens[3].substr(0, tokens[3].find("/")))-1;
-				points.push_back(vertices[f3]);
-			}
-			else points.push_back(vertices[stoi(tokens[3]) - 1]);
-			
 		}
 		count++;
 	}
-	calcNormals();
+	//calcNormals();
 }
 
 vec4 Polyhedron::randomColor() {

@@ -65,7 +65,8 @@ private:
 	vec4 ambi;
 
 	vector<vec4> vertices;
-	vector<vec4> potentialColors;
+	vector<vec3> normalVerts;
+	vector<vec2> textureVerts;
 
 	vector<vec4> points; //6 faces, 2 triangles/face, 3 vertices per triangle
 	vector<vec4> colors;
