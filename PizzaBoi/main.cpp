@@ -133,11 +133,11 @@ void init()
 	//drawables.push_back(sphere);
 
 	//cube
-	mbox = new Polyhedron();
-	mbox->loadSmf("cube");
-	mbox->setModelMatrix(Translate(2,-10,0)*Scale(1,1.8,3.2));
-	mbox->textureInit("pizzaBoiMainMenu.ppm");
-	drawables.push_back(mbox);
+	// mbox = new Polyhedron();
+	// mbox->loadObj("mainMenuScreen.obj",.1);
+	// //mbox->setModelMatrix(Translate(2,-10,0)*Scale(1,1.8,3.2));
+	// mbox->textureInit("pizzaBoiMainMenu.ppm");
+	// drawables.push_back(mbox);
 
 	//floor plane
 	mbox = new Polyhedron();
