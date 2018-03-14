@@ -259,7 +259,7 @@ void Polyhedron::loadObj(string filename, float scale) {
 	int count = 1;
 	//read
 	while (getline(infile, fin)) {
-
+		
 		istringstream iss(fin);
 		//split line
 		vector<string> tokens;
@@ -320,9 +320,7 @@ void Polyhedron::makeWireframe() {
 	}
 }
 
-void Polyhedron::pick(vec4 probe, vec4 eye) {
 
-}
 
 void Polyhedron::buildPolyhedron() {
 	vec4 c = randomColor();
