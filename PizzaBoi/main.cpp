@@ -82,7 +82,7 @@ int main(int argc, char **argv)
 	//initialize GLUT
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
-	glutInitWindowSize(512, 512);
+	glutInitWindowSize(1280, 720);
 
 	windowID = glutCreateWindow("PIZZA BOI");
 
@@ -148,12 +148,12 @@ void init()
 	drawables.push_back(mbox);
 
 	//object
-	object = new Polyhedron();
-	object->loadObj("totem.obj", 1);
-	object->setModelMatrix(Translate(-2, -.5, 1));
-	object->init();
-	//object->setModelMatrix(Translate(0, 0, 0));
-	drawables.push_back(object);
+	// object = new Polyhedron();
+	// object->loadObj("bound-cow.obj", 1);
+	// object->setModelMatrix(Translate(-2, -.5, 1));
+	// object->init();
+	// //object->setModelMatrix(Translate(0, 0, 0));
+	// drawables.push_back(object);
 
 
 	//skybox

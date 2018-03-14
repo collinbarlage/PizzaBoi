@@ -6,7 +6,7 @@ Camera::Camera() {
 
 Camera::Camera(vec4 e, vec4 u) {
 
-	projection = Perspective(65,1,1,100);
+	projection = Perspective(65,1.7777,1,100);
 	ortho = false;
 
 	xA = 0;
