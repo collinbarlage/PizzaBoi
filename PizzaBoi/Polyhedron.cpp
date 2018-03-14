@@ -197,8 +197,8 @@ void Polyhedron::makeQuad(GLuint a, GLuint b, GLuint c, GLuint d) {
 }
 
 void Polyhedron::makeTexture(char * name) {
-	int width = 512;
-	int height= 512;
+	int width = 1280;
+	int height= 720;
 	GLubyte *image0 = ppmRead(name, &width, &height);
 	glGenTextures(1, &texture);
 	glActiveTexture(GL_TEXTURE0);
