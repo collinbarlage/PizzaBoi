@@ -3,6 +3,9 @@
 *.lo
 *.o
 
+#to ensure obj files made by visual studio don't collide
+Debug/
+
 # Precompiled Headers
 *.gch
 *.pch
