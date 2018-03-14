@@ -38,8 +38,8 @@ struct SpecialInput{
 Polyhedron* mbox;
 Polyhedron* object;
 Sphere* sphere;
-Camera cam1 = Camera(vec4(0,2,-2,1), vec4(0,1,0,1));
-Camera cam2 = Camera(vec4(0,10,0,1), vec4(0,0,-1,1));
+Camera cam1 = Camera(vec4(0,2,-2,1), vec4(0,0,0,1), vec4(0,1,0,1));
+Camera cam2 = Camera(vec4(0,-10,0,1), vec4(1,-10,0,1), vec4(0,1,0,1));
 Camera *cam = &cam1;
 vector<Drawable*>drawables;
 
@@ -135,9 +135,9 @@ void init()
 	//cube
 	mbox = new Polyhedron();
 	mbox->loadSmf("cube");
-	mbox->setModelMatrix(Translate(-1,-.4,-1));
+	mbox->setModelMatrix(Translate(2,-10,0)*Scale(1,1.8,3.2));
 	mbox->textureInit("bloc.ppm");
-	//drawables.push_back(mbox);
+	drawables.push_back(mbox);
 
 	//floor plane
 	mbox = new Polyhedron();
@@ -147,13 +147,13 @@ void init()
 	mbox->textureInit("grass.ppm");
 	drawables.push_back(mbox);
 
-	object
-	object = new Polyhedron();
-	object->loadObj("totem.obj", 1);
-	object->setModelMatrix(Translate(-2, -.5, 1));
-	object->init();
-	object->setModelMatrix(Translate(0, 0, 0));
-	drawables.push_back(object);
+	//object
+	//object = new Polyhedron();
+	//object->loadObj("totem.obj", 1);
+	//object->setModelMatrix(Translate(-2, -.5, 1));
+	//object->init();
+	//object->setModelMatrix(Translate(0, 0, 0));
+	//drawables.push_back(object);
 
 
 	//skybox
