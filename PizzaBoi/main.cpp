@@ -43,8 +43,8 @@ struct SpecialInput{
 Polyhedron* mbox;
 Object* object;
 Sphere* sphere;
-Camera cam1 = Camera(vec4(0,0,0.5,1), vec4(0,1,0,1));
-Camera cam2 = Camera(vec4(0,10,0,1), vec4(0,0,-1,1));
+Camera cam1 = Camera(vec4(0,0,0.5,1), vec4(0,0,0,1), vec4(0, 1, 0, 1));
+Camera cam2 = Camera(vec4(0,10,0,1), vec4(0,0,-1,1), vec4(0, 1, 0, 1));
 Camera *cam = &cam1;
 vector<Drawable*>drawables;
 
