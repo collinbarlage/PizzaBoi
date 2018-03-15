@@ -17,11 +17,14 @@ void click(int button, int state, int x, int y);
 void resize(int width, int height);
 void close(void);
 void timerCallback(int value);
+void setViewByMouse(int x, int y);
+
 
 //helper functions
 void toggleKey(unsigned char key, bool toggle);
 void toggleSpecialInput(int key, bool toggle);
 void animateKeys();
+
 
 struct Key{
 	char key;
@@ -38,7 +41,7 @@ struct SpecialInput{
 Polyhedron* mbox;
 Polyhedron* object;
 Sphere* sphere;
-Camera cam1 = Camera(vec4(0,2,-2,1), vec4(0,1,0,1));
+Camera cam1 = Camera(vec4(0,0,0.5,1), vec4(0,1,0,1));
 Camera cam2 = Camera(vec4(0,10,0,1), vec4(0,0,-1,1));
 Camera *cam = &cam1;
 vector<Drawable*>drawables;
@@ -58,13 +61,17 @@ vec4 getCameraEye();
 GLuint windowID=0;
 
 //Put any keys here that you want to be animated when held down
-enum E_Keys {z=0, Z, xKey, X, c, C, KEYS_SIZE}; //make sure KEYS_SIZE is always last element in enum
+enum E_Keys {z=0, Z, xKey, X, c, C, a, s, d, w, KEYS_SIZE}; //make sure KEYS_SIZE is always last element in enum
 Key keys[] = {{'z', false},
               {'Z', false},
               {'x', false},
               {'X', false},
-              {'c', false},
-              {'C', false}};
+			  {'c', false},
+			  {'C', false},
+		      {'a', false},
+			  {'s', false},
+			  {'d', false},
+              {'w', false}};
 
 //Put any special inputs here that you want to be animated when held down
 enum E_SInputs {Up=0, Down, Left, Right, SINPUTS_SIZE}; //make sure SINPUTS_SIZE is always last element in enum
@@ -73,6 +80,9 @@ SpecialInput sInputs[] = {{GLUT_KEY_UP, false},
 						  {GLUT_KEY_LEFT, false},
 						  {GLUT_KEY_RIGHT, false}};
 
+//Screen size
+int SCREENWIDTH = 512;
+int SCREENHEIGHT = 512;
 
 //----------------------------------------------------------------------------
 
@@ -82,7 +92,7 @@ int main(int argc, char **argv)
 	//initialize GLUT
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
-	glutInitWindowSize(512, 512);
+	glutInitWindowSize(SCREENWIDTH, SCREENHEIGHT);
 
 	windowID = glutCreateWindow("PIZZA BOI");
 
@@ -108,6 +118,7 @@ int main(int argc, char **argv)
 	glutSpecialFunc(specialInput);
 	glutSpecialUpFunc(specialInputUp);
 	glutMouseFunc(click);
+	glutPassiveMotionFunc(setViewByMouse);
 
 	//start the main event listening loop
 	glutMainLoop();
@@ -165,6 +176,9 @@ void init()
 	
 	//orbit sun
 	timerCallback(0);
+
+	glutSetCursor(GLUT_CURSOR_NONE);
+
 }
 
 //----------------------------------------------------------------------------
@@ -277,6 +291,13 @@ void animateKeys() {
 	if (keys[C].pressed)  			cam->rotate(0, 1, 0);
 	if (keys[xKey].pressed)  		cam->rotate(-1, 0, 0);
 	if (keys[X].pressed)  			cam->rotate(1, 0, 0);
+	
+
+	if (keys[w].pressed)  			cam->fpsMove(-0.05, 0, 0.05, true);
+	if (keys[s].pressed)  			cam->fpsMove(0.05, 0, -0.05, true);
+	if (keys[a].pressed)  			cam->fpsMove(0.05, 0, 0.05, false);
+	if (keys[d].pressed)  			cam->fpsMove(-0.05, 0, -0.05, false);
+
 
 	if (sInputs[Up].pressed) {
 		cam->move(0, 0, -.05);
@@ -312,4 +333,41 @@ mat4 getCameraMatrix(){
 
 vec4 getCameraEye(){
 	return cam->eye;
+}
+
+//mouse over event
+void setViewByMouse(int x, int y)
+{
+
+	GLfloat MouseSensitivity = 10;
+	GLfloat CurrentRotationX = cam->xA;
+
+	// the coordinates of our mouse coordinates
+	int MouseX = x;
+	int MouseY = y;
+
+	// the middle of the screen in the x direction
+	int MiddleX = SCREENWIDTH / 2;
+
+	// the middle of the screen in the y direction
+	int MiddleY = SCREENHEIGHT / 2;
+
+	// vector that describes mouseposition - center
+	vec3 MouseDirection = vec3(0.0, 0.0, 0.0);
+
+	static GLfloat CurrentRotationAboutX = 0.0;
+
+	// The maximum angle we can look up or down, in radians
+	double maxAngle = 1;
+
+	// if the mouse hasn't moved, return without doing
+	// anything to our view
+	if ((MouseX == MiddleX) && (MouseY == MiddleY))
+		return;
+
+	glutWarpPointer(MiddleX, MiddleY);
+	MouseDirection.x = (MiddleX - MouseX) / MouseSensitivity;
+	MouseDirection.y = (MiddleY - MouseY) / MouseSensitivity;
+	
+	cam->fpsRotate(0, MouseDirection.x, 0);
 }

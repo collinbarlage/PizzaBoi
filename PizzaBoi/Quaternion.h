@@ -10,10 +10,10 @@ public:
 	Quaternion conjugate();
 	Quaternion mult(Quaternion B);
 
-	double x;
-	double y;
-	double z;
-	double w;
+	GLfloat x;
+	GLfloat y;
+	GLfloat z;
+	GLfloat w;
 
 	
 };
