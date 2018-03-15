@@ -42,6 +42,7 @@ void Object::transform(mat4 m) {
 void Object::makePizza() {
 	poly = new Polyhedron();
 	poly->loadObj("./objects/pizzaPie.obj", 1);
+	/*
 	switch(random(3)) {
 	case 1:	
 		poly->textureInit("./objects/pizzaCheese.ppm", 1280, 720);
@@ -54,6 +55,9 @@ void Object::makePizza() {
 
 		break;
 	}
+	*/
+	poly->textureInit("./objects/pizzaSpecial.ppm", 1280, 720);
+
 	polyhedrons.push_back(poly);
 
 	poly = new Polyhedron();

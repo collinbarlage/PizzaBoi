@@ -10,6 +10,7 @@
 //Forward declarations
 void init(void);
 void startGame(void);
+void kill(void);
 void display(void);
 void keyboard(unsigned char, int, int);
 void keyboardup(unsigned char, int, int);
@@ -44,8 +45,8 @@ Polyhedron* mbox;
 Object* object;
 Sphere* sphere;
 Camera cam1 = Camera(vec4(0,0,0.5,1), vec4(0,0,0,1), vec4(0, 1, 0, 1));
-Camera cam2 = Camera(vec4(0,10,0,1), vec4(0,0,-1,1), vec4(0, 1, 0, 1));
-Camera *cam = &cam1;
+Camera cam2 = Camera(vec4(0,-10,0,1), vec4(1,-10,0,1), vec4(0,1,0,1));
+Camera *cam = &cam2;
 vector<Drawable*>drawables;
 
 //Lights
@@ -120,7 +121,6 @@ int main(int argc, char **argv)
 	glutSpecialFunc(specialInput);
 	glutSpecialUpFunc(specialInputUp);
 	glutMouseFunc(click);
-	glutPassiveMotionFunc(setViewByMouse);
 
 	//start the main event listening loop
 	glutMainLoop();
@@ -177,19 +177,25 @@ void init()
 	
 	//orbit sun
 	timerCallback(0);
-
-	glutSetCursor(GLUT_CURSOR_NONE);
-
 }
 
 //Game Start
 void startGame() {
+	glutPassiveMotionFunc(setViewByMouse);
+	glutSetCursor(GLUT_CURSOR_NONE);
 	//pizza
 		srand(time(0));
 
 	for(float i=1; i<=10; i+=2.25) {
-		drawables.push_back(new Object("pizza", Translate(0,0,i)));
+		drawables.push_back(new Object("pizza", Translate(0,-.9,i)));
 	}
+}
+
+void kill() {
+	isAtMainMenu = true;
+	cam = &cam2;
+	glutSetCursor(GLUT_CURSOR_INHERIT);
+
 }
 
 //----------------------------------------------------------------------------
@@ -240,8 +246,7 @@ void keyboard(unsigned char key, int x, int y)
 	if(key == 'q' || key == 'Q') close();
 	if (key == 'p' || key == 'P') cam->toggleProj();
 	if (key == ' ') {
-		isAtMainMenu = true;
-		cam = &cam2;
+		kill();
 	}
 	toggleKey(key, true);
 }
