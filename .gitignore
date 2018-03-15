@@ -80,10 +80,12 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 *.tlog
-PizzaBoi/Debug/vc110.idb
+PizzaBoi/Debug/
 *.lastbuildstate
 *.psess
 PizzaBoi.opensdf
 
 # Visual Studio Binaries
 .vs/
+*.sdf
+!*obj

@@ -5,9 +5,9 @@ Camera::Camera() {
 
 }
 
-Camera::Camera(vec4 e, vec4 u) {
+Camera::Camera(vec4 e, vec4 a, vec4 u) { //eye (orgin), at, up
 
-	projection = Perspective(65,1,1,100);
+	projection = Perspective(65,1.7777,1,100);
 	ortho = false;
 
 
@@ -16,7 +16,7 @@ Camera::Camera(vec4 e, vec4 u) {
 	zA = 0;
 
 	eye = e;
-	at  = vec4(0,0,0,1);
+	at  = a;
 	up  = u;
 
 	setCameraMatrix(LookAt(eye, at, up));

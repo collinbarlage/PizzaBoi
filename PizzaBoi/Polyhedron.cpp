@@ -58,7 +58,7 @@ void Polyhedron::init() {
 	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(sizeof(points)*points.size()));
 }
 
-void Polyhedron::textureInit(char * textureName) {
+void Polyhedron::textureInit(char * name, int width, int height) {
 	index = 0;
 	//buildCube();
 	
@@ -107,7 +107,7 @@ void Polyhedron::textureInit(char * textureName) {
 	glVertexAttribPointer(vTex, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(sizeof(points)*points.size()*2));
 
 	///set up texture
-	makeTexture(textureName);
+	makeTexture(name, width, height);
 }
 
 Polyhedron::~Polyhedron(){
@@ -196,14 +196,14 @@ void Polyhedron::makeQuad(GLuint a, GLuint b, GLuint c, GLuint d) {
 	addVert(data[a]); normals.push_back(N); textureCoords.push_back(vec2(0,1));
 }
 
-void Polyhedron::makeTexture(char * name) {
-	int width = 512;
-	int height= 512;
-	GLubyte *image0 = ppmRead(name, &width, &height);
+void Polyhedron::makeTexture(char * name, int width, int height) {
+	int x = width;
+	int y= height;
+	GLubyte *image0 = ppmRead(name, &x, &y);
 	glGenTextures(1, &texture);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x, y, 0, GL_RGB,
 	GL_UNSIGNED_BYTE, image0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -259,7 +259,7 @@ void Polyhedron::loadObj(string filename, float scale) {
 	int count = 1;
 	//read
 	while (getline(infile, fin)) {
-
+		
 		istringstream iss(fin);
 		//split line
 		vector<string> tokens;
@@ -268,34 +268,35 @@ void Polyhedron::loadObj(string filename, float scale) {
 			back_inserter(tokens));
 		if (tokens.size() > 0 && !tokens[0].compare("v")) {
 			vertices.push_back(vec4(stof(tokens[1]) * scale, stof(tokens[2]) * scale, stof(tokens[3]) * scale, 1));
-		}
-		else if (tokens.size() > 0 && !tokens[0].compare("f")) {
+		} else if (tokens.size() > 0 && !tokens[0].compare("vn")) {
+			normalVerts.push_back(vec3(stof(tokens[1]), stof(tokens[2]), stof(tokens[3])));
+		} else if (tokens.size() > 0 && !tokens[0].compare("vt")) {
+			textureVerts.push_back(vec2(stof(tokens[1]), stof(tokens[2])));
+		} else if (tokens.size() > 0 && !tokens[0].compare("f")) {
 
-			int f1;
-			int f2;
-			int f3;
+			int f[3];
+			int t[3];
+			int n[3];
 
-			if (tokens[1].find("/") != std::string::npos) {
-				f1 = stoi(tokens[1].substr(0, tokens[1].find("/")))-1;
-				points.push_back(vertices[f1]);
-			} else points.push_back(vertices[stoi(tokens[1]) - 1]);
-
-			if (tokens[2].find("/") != std::string::npos) {
-				f2 = stoi(tokens[2].substr(0, tokens[2].find("/")))-1;
-				points.push_back(vertices[f2]);
+			for(int i=0; i<3; i++) {
+				if (tokens[i+1].find("/") != std::string::npos) {
+					//point
+					f[i] = stoi(tokens[i+1].substr(0, tokens[i+1].find("/")))-1;
+					points.push_back(vertices[f[i]]);
+					tokens[i+1] = tokens[i+1].substr(tokens[i+1].find("/")+1);
+					//texture
+					t[i] = stoi(tokens[i+1].substr(0, tokens[i+1].find("/")))-1;
+					textureCoords.push_back(vec2(textureVerts[t[i]].x,-1* textureVerts[t[i]].y));
+					tokens[i+1] = tokens[i+1].substr(tokens[i+1].find("/")+1);
+					//normal
+					n[i] = stoi(tokens[i+1])-1;
+					normals.push_back(normalVerts[n[i]]);
+				} else points.push_back(vertices[stoi(tokens[i+1]) - 1]);
 			}
-			else points.push_back(vertices[stoi(tokens[2]) - 1]);
-
-			if (tokens[3].find("/") != std::string::npos) {
-				f3 = stoi(tokens[3].substr(0, tokens[3].find("/")))-1;
-				points.push_back(vertices[f3]);
-			}
-			else points.push_back(vertices[stoi(tokens[3]) - 1]);
-			
 		}
 		count++;
 	}
-	calcNormals();
+	//calcNormals();
 }
 
 vec4 Polyhedron::randomColor() {
@@ -319,9 +320,7 @@ void Polyhedron::makeWireframe() {
 	}
 }
 
-void Polyhedron::pick(vec4 probe, vec4 eye) {
 
-}
 
 void Polyhedron::buildPolyhedron() {
 	vec4 c = randomColor();

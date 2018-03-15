@@ -2,12 +2,14 @@
 #include "Camera.h"  //for camera objects (for use in future assignments)
 #include "Light.h"	//for lights (for use in future assignments)
 #include "Polyhedron.h"  //blue box object!
+#include "Object.h"  //a pizza
 #include "Sphere.h"  //a ball!?
 #include <cstdlib>
 #include <ctime>
 
 //Forward declarations
 void init(void);
+void startGame(void);
 void display(void);
 void keyboard(unsigned char, int, int);
 void keyboardup(unsigned char, int, int);
@@ -39,7 +41,7 @@ struct SpecialInput{
 
 //Objects
 Polyhedron* mbox;
-Polyhedron* object;
+Object* object;
 Sphere* sphere;
 Camera cam1 = Camera(vec4(0,0,0.5,1), vec4(0,1,0,1));
 Camera cam2 = Camera(vec4(0,10,0,1), vec4(0,0,-1,1));
@@ -54,7 +56,7 @@ float orbitTime = 0;
 
 
 //Helpers
-bool camSelect = false;
+bool isAtMainMenu = true;
 bool stoneSelect = false;
 mat4 getCameraMatrix();
 vec4 getCameraEye();
@@ -81,14 +83,14 @@ SpecialInput sInputs[] = {{GLUT_KEY_UP, false},
 						  {GLUT_KEY_RIGHT, false}};
 
 //Screen size
-int SCREENWIDTH = 512;
-int SCREENHEIGHT = 512;
+int SCREENWIDTH = 1280;
+int SCREENHEIGHT = 720;
 
 //----------------------------------------------------------------------------
 
 int main(int argc, char **argv)
 {
-	srand(time(NULL));
+	//srand(time(NULL));
 	//initialize GLUT
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
@@ -136,6 +138,13 @@ void init()
 	lights.push_back(&sun);
 	flashlight.on = 0; //initilize flashlight to be off
 	lights.push_back(&flashlight);
+	
+	//main menu
+	mbox = new Polyhedron();
+	mbox->loadObj("mainMenu.obj", 1);
+	mbox->setModelMatrix(Translate(2,-10,0)*Scale(1.5,1.5,1.5)*RotateY(90));
+	mbox->textureInit("pizzaBoiMainMenu.ppm", 1280, 720);
+	drawables.push_back(mbox);
 
 	//sphere
 	sphere = new Sphere(64,vec4(5.0, 0.794, 0.886,1),vec4(0.1, 0.694, 0.986,1),vec4(0.0, 0.1, 0.2,1));
@@ -143,35 +152,27 @@ void init()
 	sphere->init();
 	//drawables.push_back(sphere);
 
-	//cube
-	mbox = new Polyhedron();
-	mbox->loadSmf("cube");
-	mbox->setModelMatrix(Translate(-1,-.4,-1));
-	mbox->textureInit("bloc.ppm");
-	//drawables.push_back(mbox);
-
 	//floor plane
 	mbox = new Polyhedron();
 	mbox->loadSmf("cube");
-	//mbox->setModelMatrix(Translate(-1,-.4,-1));
 	mbox->setModelMatrix(Translate(0,-1.5,0)*Scale(15.0,0.1,15.0));
-	mbox->textureInit("grass.ppm");
+	mbox->textureInit("grass.ppm", 1280, 720);
 	drawables.push_back(mbox);
 
-	//object
-	object = new Polyhedron();
-	object->loadObj("totem.obj", 1);
-	object->setModelMatrix(Translate(-2, -.5, 1));
-	object->init();
-	//object->setModelMatrix(Translate(0, 0, 0));
-	drawables.push_back(object);
+	//totem
+	//mbox = new Polyhedron();
+	//mbox->loadObj("totem.obj", 1);
+	//mbox->setModelMatrix(Translate(-2, -.5, 1));
+	//mbox->init();
+	//mbox->setModelMatrix(Translate(0, 0, 0));
+	//drawables.push_back(mbox);
 
 
 	//skybox
 	mbox = new Polyhedron();
 	mbox->loadSmf("cube");
 	mbox->setModelMatrix(Translate(0,0,0)*Scale(50.0,50.0,50.0));
-	mbox->textureInit("sky.ppm");
+	mbox->textureInit("sky.ppm", 1280, 720);
 	drawables.push_back(mbox);
 	
 	//orbit sun
@@ -179,6 +180,16 @@ void init()
 
 	glutSetCursor(GLUT_CURSOR_NONE);
 
+}
+
+//Game Start
+void startGame() {
+	//pizza
+		srand(time(0));
+
+	for(float i=1; i<=10; i+=2.25) {
+		drawables.push_back(new Object("pizza", Translate(0,0,i)));
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -200,20 +211,26 @@ void resize(int w, int h) {
 
 
 void click(int button, int state, int x, int y) {
-	float xp, yp;
+	srand(time(NULL));
+	cout << "time:" << time(NULL) << endl;
 
-	if(state == 0) {
-		//cout << "CLICKED at " << x << ", " << y << endl;
-		xp = (2*float(x)/512)-1;
-		yp = 1-(2*float(y)/512);
-		//cout << "xp = " << xp << "yp = " << yp << endl;
-		vec4 pFront = vec4(xp, yp, -1, 1);
-		vec4 pCam = inverse(getCameraMatrix())*pFront;
-		vec4 pWorld = inverse(getCameraMatrix())*pCam;
-		vec4 rayWorld = pWorld - getCameraEye();
+	if(isAtMainMenu && state == 1 && x >440 && x < 889 && y > 443 && y < 690) {
+		//Show loading screen
+		drawables[0]->makeTexture("pizzaBoiLoad.ppm", 1280, 720);
+		display();
+		//Delete old game
+		drawables.clear();
+		init();
 
-		drawables[1]->pick(rayWorld, getCameraEye());
-		// display();
+		//Load Game
+		isAtMainMenu = false;
+		cam = &cam1;
+		drawables[0]->makeTexture("pizzaBoiDeath.ppm", 1280, 720);
+
+		//START GAME
+		startGame();
+		display();
+
 	}	
 }
 
@@ -222,9 +239,10 @@ void keyboard(unsigned char key, int x, int y)
 	//put keys here that aren't meant to be held down / animated
 	if(key == 'q' || key == 'Q') close();
 	if (key == 'p' || key == 'P') cam->toggleProj();
-	if (key == ' ') cam = &cam2;
-	// if (key == ' ') camToggle = !camToggle;
-
+	if (key == ' ') {
+		isAtMainMenu = true;
+		cam = &cam2;
+	}
 	toggleKey(key, true);
 }
 
