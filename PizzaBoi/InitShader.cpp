@@ -25,7 +25,7 @@ char* readShaderSource(const char* shaderFile)
 	buf[size] = '\0';  /* null termination */
     fclose(fp);
 
-	printf("%s\n", buf);
+	//printf("%s\n", buf);
 
     return buf;
 
@@ -53,7 +53,7 @@ InitShader(const char* vShaderFile, const char* fShaderFile)
 	Shader& s = shaders[i];
 	s.source = readShaderSource( s.filename );
 
-	std::cout << "Printed Shader Read Status" << std::endl;
+	//std::cout << "Printed Shader Read Status" << std::endl;
 		
 	if ( shaders[i].source == NULL ) {
 	    std::cerr << "Failed to read " << s.filename << std::endl;
