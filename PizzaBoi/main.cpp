@@ -80,7 +80,7 @@ SpecialInput sInputs[] = {{GLUT_KEY_UP, false},
 
 int main(int argc, char **argv)
 {
-	srand(time(NULL));
+	//srand(time(NULL));
 	//initialize GLUT
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
@@ -197,13 +197,26 @@ void resize(int w, int h) {
 
 
 void click(int button, int state, int x, int y) {
-	if(isAtMainMenu && state == 0 && x >440 && x < 889 && y > 443 && y < 690) {
+	srand(time(NULL));
+	cout << "time:" << time(NULL) << endl;
+
+	if(isAtMainMenu && state == 1 && x >440 && x < 889 && y > 443 && y < 690) {
+		//Show loading screen
+		drawables[0]->makeTexture("pizzaBoiLoad.ppm", 1280, 720);
+		display();
+		//Delete old game
+		drawables.clear();
+		init();
+
+		//Load Game
 		isAtMainMenu = false;
 		cam = &cam1;
 		drawables[0]->makeTexture("pizzaBoiDeath.ppm", 1280, 720);
+
 		//START GAME
 		startGame();
 		display();
+
 	}	
 }
 
