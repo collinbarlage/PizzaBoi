@@ -9,6 +9,7 @@
 
 //Forward declarations
 void init(void);
+void startGame(void);
 void display(void);
 void keyboard(unsigned char, int, int);
 void keyboardup(unsigned char, int, int);
@@ -146,11 +147,6 @@ void init()
 	mbox->setModelMatrix(Translate(0,-1.5,0)*Scale(15.0,0.1,15.0));
 	mbox->textureInit("grass.ppm", 1280, 720);
 	drawables.push_back(mbox);
-	
-	//pizza
-	object = new Object("pizza");
-	drawables.push_back(object);
-
 
 	//totem
 	//mbox = new Polyhedron();
@@ -170,6 +166,16 @@ void init()
 	
 	//orbit sun
 	timerCallback(0);
+}
+
+//Game Start
+void startGame() {
+	//pizza
+		srand(time(0));
+
+	for(float i=1; i<=10; i+=2.25) {
+		drawables.push_back(new Object("pizza", Translate(0,0,i)));
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -196,7 +202,7 @@ void click(int button, int state, int x, int y) {
 		cam = &cam1;
 		drawables[0]->makeTexture("pizzaBoiDeath.ppm", 1280, 720);
 		//START GAME
-		
+		startGame();
 		display();
 	}	
 }

@@ -20,16 +20,19 @@ class Object: public Drawable{
 
 
 public:
-	Object(string n);
+	Object(string, mat4=Scale(1,1,1), float r=(float) rand() / (RAND_MAX));
 	~Object();
 
 	void draw(Camera, vector<Light*>);
 	void makeTexture(char * name, int width, int height);
+	void transform(mat4 m);
 
 private:
 	Polyhedron * poly;
 	vector<Polyhedron*> polyhedrons;
 	void makePizza();
 	void makeHouse();
+	int random(int p);
+	float seed;
 };
 #endif
