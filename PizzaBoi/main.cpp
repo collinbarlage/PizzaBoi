@@ -171,7 +171,7 @@ void init()
 	//skybox
 	mbox = new Polyhedron();
 	mbox->loadSmf("cube");
-	mbox->setModelMatrix(Translate(0,0,0)*Scale(50.0,50.0,50.0));
+	mbox->setModelMatrix(Translate(0,0,0)*Scale(90.0,90.0,90.0));
 	mbox->textureInit("sky.ppm", 1280, 720);
 	drawables.push_back(mbox);
 	
@@ -195,6 +195,8 @@ void kill() {
 	isAtMainMenu = true;
 	//undo fps camera
 	glutSetCursor(GLUT_CURSOR_INHERIT);
+	//reset cameras
+	cam1 = Camera(vec4(0,0,0.5,1), vec4(0,0,0,1), vec4(0, 1, 0, 1));
 	cam2 = Camera(vec4(0,-10,0,1), vec4(1,-10,0,1), vec4(0,1,0,1));
 	cam = &cam2;
 
@@ -310,35 +312,36 @@ void timerCallback(int value) {
 
 //Holds all keys and their animations. Meant for the timerCallback function
 void animateKeys() {
-	if (keys[z].pressed)  			cam->rotate(0, 0, -1);
-	if (keys[Z].pressed)  			cam->rotate(0, 0, 1);
-	if (keys[c].pressed)  			cam->rotate(0, -1, 0);
-	if (keys[C].pressed)  			cam->rotate(0, 1, 0);
-	if (keys[xKey].pressed)  		cam->rotate(-1, 0, 0);
-	if (keys[X].pressed)  			cam->rotate(1, 0, 0);
+	if(!isAtMainMenu) {
+		if (keys[z].pressed)  			cam->rotate(0, 0, -1);
+		if (keys[Z].pressed)  			cam->rotate(0, 0, 1);
+		if (keys[c].pressed)  			cam->rotate(0, -1, 0);
+		if (keys[C].pressed)  			cam->rotate(0, 1, 0);
+		if (keys[xKey].pressed)  		cam->rotate(-1, 0, 0);
+		if (keys[X].pressed)  			cam->rotate(1, 0, 0);
 	
+		if (keys[w].pressed)  			cam->fpsMove(-0.05, 0, 0.05, true);
+		if (keys[s].pressed)  			cam->fpsMove(0.05, 0, -0.05, true);
+		if (keys[a].pressed)  			cam->fpsMove(0.05, 0, 0.05, false);
+		if (keys[d].pressed)  			cam->fpsMove(-0.05, 0, -0.05, false);
 
-	if (keys[w].pressed)  			cam->fpsMove(-0.05, 0, 0.05, true);
-	if (keys[s].pressed)  			cam->fpsMove(0.05, 0, -0.05, true);
-	if (keys[a].pressed)  			cam->fpsMove(0.05, 0, 0.05, false);
-	if (keys[d].pressed)  			cam->fpsMove(-0.05, 0, -0.05, false);
 
-
-	if (sInputs[Up].pressed) {
-		cam->move(0, 0, -.05);
-		flashlight.move(0, 0, .05);
-	}
-	if (sInputs[Down].pressed) {
-		cam->move(0, 0, .05);
-		flashlight.move(0, 0, -.05);
-	}
-	if (sInputs[Left].pressed) {
-		cam->move(-.05, 0, 0);
-		flashlight.move(.05, 0, 0);
-	}
-	if (sInputs[Right].pressed) {
-		cam->move(.05, 0, 0);
-		flashlight.move(-.05, 0, 0);
+		if (sInputs[Up].pressed) {
+			cam->move(0, 0, -.05);
+			flashlight.move(0, 0, .05);
+		}
+		if (sInputs[Down].pressed) {
+			cam->move(0, 0, .05);
+			flashlight.move(0, 0, -.05);
+		}
+		if (sInputs[Left].pressed) {
+			cam->move(-.05, 0, 0);
+			flashlight.move(.05, 0, 0);
+		}
+		if (sInputs[Right].pressed) {
+			cam->move(.05, 0, 0);
+			flashlight.move(-.05, 0, 0);
+		}
 	}
 }
 
@@ -363,36 +366,37 @@ vec4 getCameraEye(){
 //mouse over event
 void setViewByMouse(int x, int y)
 {
+	if(!isAtMainMenu) {
+		GLfloat MouseSensitivity = 10;
+		GLfloat CurrentRotationX = cam->xA;
 
-	GLfloat MouseSensitivity = 10;
-	GLfloat CurrentRotationX = cam->xA;
+		// the coordinates of our mouse coordinates
+		int MouseX = x;
+		int MouseY = y;
 
-	// the coordinates of our mouse coordinates
-	int MouseX = x;
-	int MouseY = y;
+		// the middle of the screen in the x direction
+		int MiddleX = SCREENWIDTH / 2;
 
-	// the middle of the screen in the x direction
-	int MiddleX = SCREENWIDTH / 2;
+		// the middle of the screen in the y direction
+		int MiddleY = SCREENHEIGHT / 2;
 
-	// the middle of the screen in the y direction
-	int MiddleY = SCREENHEIGHT / 2;
+		// vector that describes mouseposition - center
+		vec3 MouseDirection = vec3(0.0, 0.0, 0.0);
 
-	// vector that describes mouseposition - center
-	vec3 MouseDirection = vec3(0.0, 0.0, 0.0);
+		static GLfloat CurrentRotationAboutX = 0.0;
 
-	static GLfloat CurrentRotationAboutX = 0.0;
+		// The maximum angle we can look up or down, in radians
+		double maxAngle = 1;
 
-	// The maximum angle we can look up or down, in radians
-	double maxAngle = 1;
+		// if the mouse hasn't moved, return without doing
+		// anything to our view
+		if ((MouseX == MiddleX) && (MouseY == MiddleY))
+			return;
 
-	// if the mouse hasn't moved, return without doing
-	// anything to our view
-	if ((MouseX == MiddleX) && (MouseY == MiddleY))
-		return;
+		glutWarpPointer(MiddleX, MiddleY);
+		MouseDirection.x = (MiddleX - MouseX) / MouseSensitivity;
+		MouseDirection.y = (MiddleY - MouseY) / MouseSensitivity;
 
-	glutWarpPointer(MiddleX, MiddleY);
-	MouseDirection.x = (MiddleX - MouseX) / MouseSensitivity;
-	MouseDirection.y = (MiddleY - MouseY) / MouseSensitivity;
-	
-	cam->fpsRotate(0, MouseDirection.x, 0);
+		cam->fpsRotate(0, MouseDirection.x, 0);
+	}
 }
