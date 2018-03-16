@@ -21,6 +21,7 @@
     <ClInclude Include="mat.h" />
     <ClInclude Include="Quaternion.h" />
     <ClInclude Include="Sphere.h" />
+    <ClInclude Include="Texture.h" />
     <ClInclude Include="vec.h" />
   </ItemGroup>
   <ItemGroup>
@@ -41,6 +42,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Quaternion.cpp" />
     <ClCompile Include="Sphere.cpp" />
+    <ClCompile Include="Texture.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{762F0968-D29C-4317-9EAA-B7B0E0D23E64}</ProjectGuid>

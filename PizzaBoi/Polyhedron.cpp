@@ -58,9 +58,10 @@ void Polyhedron::init() {
 	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(sizeof(points)*points.size()));
 }
 
-void Polyhedron::textureInit(char * name, int width, int height) {
+void Polyhedron::textureInit(Texture t) {
 	index = 0;
 	//buildCube();
+
 	
 	//get buffers for attributes and indices
 	glGenBuffers(1, &VBO);
@@ -106,8 +107,26 @@ void Polyhedron::textureInit(char * name, int width, int height) {
 	glEnableVertexAttribArray(vTex);
 	glVertexAttribPointer(vTex, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(sizeof(points)*points.size()*2));
 
-	///set up texture
-	makeTexture(name, width, height);
+	///load up texture
+	int x = t.width;
+	int y = t.height;
+
+	if(!t.isLoaded) {
+		t.setImage(ppmRead(t.name, &x, &y));
+		t.isLoaded = true;
+		cout << "loading texture" << t.name << endl;
+	}
+	GLubyte * image = t.getImage();
+	
+	glGenTextures(1, &texture);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x, y, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
 }
 
 Polyhedron::~Polyhedron(){
@@ -165,6 +184,22 @@ void Polyhedron::draw(Camera cam, vector<Light*> lights){
 	//}
 }
 
+void Polyhedron::updateTexture(Texture t) {
+	int x = t.width;
+	int y= t.height;
+	GLubyte *image0 = ppmRead(t.name, &x, &y);
+	glGenTextures(1, &texture);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x, y, 0, GL_RGB,
+	GL_UNSIGNED_BYTE, image0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+}
+
 void Polyhedron::calcNormals() {
 	for(int i=0; i<points.size(); i+=3) {
 		vec3 N = normalize(cross(points[i+1]-points[i],points[i+2]-points[i]));
@@ -194,21 +229,6 @@ void Polyhedron::makeQuad(GLuint a, GLuint b, GLuint c, GLuint d) {
 	addVert(data[c]); normals.push_back(N); textureCoords.push_back(vec2(0,0));
 	addVert(data[d]); normals.push_back(N); textureCoords.push_back(vec2(1,1));
 	addVert(data[a]); normals.push_back(N); textureCoords.push_back(vec2(0,1));
-}
-
-void Polyhedron::makeTexture(char * name, int width, int height) {
-	int x = width;
-	int y= height;
-	GLubyte *image0 = ppmRead(name, &x, &y);
-	glGenTextures(1, &texture);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x, y, 0, GL_RGB,
-	GL_UNSIGNED_BYTE, image0);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 }
 
 void Polyhedron::addVert(vec4 v) {

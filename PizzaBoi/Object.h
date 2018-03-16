@@ -6,6 +6,7 @@
 #include "Camera.h"
 #include "Light.h"
 #include "Polyhedron.h"
+#include "Texture.h"
 #include <ctime>
 #include <cstdlib>
 #include <string>
@@ -20,19 +21,26 @@ class Object: public Drawable{
 
 
 public:
-	Object(string, mat4=Scale(1,1,1), float r=(float) rand() / (RAND_MAX));
+	Object(float r=(float) rand() / (RAND_MAX)); //Loads all textures for objects
 	~Object();
 
 	void draw(Camera, vector<Light*>);
-	void makeTexture(char * name, int width, int height);
+	void updateTexture(Texture t);
 	void transform(mat4 m);
+	void makePizza(mat4=Scale(1,1,1));
+	void makeHouse(mat4=Scale(1,1,1));
 
 private:
 	Polyhedron * poly;
 	vector<Polyhedron*> polyhedrons;
-	void makePizza();
-	void makeHouse();
 	int random(int p);
 	float seed;
+	
+	//Textures:
+	Texture tPizzaPep;
+	Texture tPizzaCheese;
+	Texture tPizzaSpecial;
+	Texture tPizzaCrust;
+	
 };
 #endif

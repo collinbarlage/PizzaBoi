@@ -4,6 +4,7 @@
 #include "Polyhedron.h"  //blue box object!
 #include "Object.h"  //a pizza
 #include "Sphere.h"  //a ball!?
+#include "Texture.h"  //a pic
 #include <cstdlib>
 #include <ctime>
 
@@ -42,7 +43,7 @@ struct SpecialInput{
 
 //Objects
 Polyhedron* mbox;
-Object* object;
+Object* object = new Object(); //Loads all textures for objects
 Sphere* sphere;
 Camera cam1 = Camera(vec4(0,0,0.5,1), vec4(0,0,0,1), vec4(0, 1, 0, 1));
 Camera cam2 = Camera(vec4(0,-10,0,1), vec4(1,-10,0,1), vec4(0,1,0,1));
@@ -54,6 +55,13 @@ vector<Light*> lights;
 Light sun = Light(vec4(2,10,0,1),vec4(.9,.7,.5,1),vec4(1,1,1,1),vec4(.3,1,1,1));
 Light flashlight = Light(vec4(0,2,-2,1),vec4(.2,.1,.1,1),vec4(.3,.1,0,1),vec4(.5,.5,.1,1));
 float orbitTime = 0;
+
+//Textures (just global textures. Other textures loaded in Object() constructor)
+Texture tMainMenu = Texture("pizzaBoiMainMenu.ppm", 1280, 720);
+Texture tLoad = Texture("pizzaBoiLoad.ppm", 1280, 720);
+Texture tDeath = Texture("pizzaBoiDeath.ppm", 1280, 720);
+Texture tGrass = Texture("grass.ppm", 1280, 720);
+Texture tSky = Texture("sky.ppm", 1280, 720);
 
 
 //Helpers
@@ -91,6 +99,7 @@ int SCREENHEIGHT = 720;
 
 int main(int argc, char **argv)
 {
+	cout <<"PIZAA - BOI" << endl;
 	//srand(time(NULL));
 	//initialize GLUT
 	glutInit(&argc, argv);
@@ -143,7 +152,7 @@ void init()
 	mbox = new Polyhedron();
 	mbox->loadObj("mainMenu.obj", 1);
 	mbox->setModelMatrix(Translate(2,-10,0)*Scale(1.5,1.5,1.5)*RotateY(90));
-	mbox->textureInit("pizzaBoiMainMenu.ppm", 1280, 720);
+	mbox->textureInit(tMainMenu);
 	drawables.push_back(mbox);
 
 	//sphere
@@ -156,7 +165,7 @@ void init()
 	mbox = new Polyhedron();
 	mbox->loadSmf("cube");
 	mbox->setModelMatrix(Translate(0,-1.5,0)*Scale(15.0,0.1,15.0));
-	mbox->textureInit("grass.ppm", 1280, 720);
+	mbox->textureInit(tGrass);
 	drawables.push_back(mbox);
 
 	//totem
@@ -172,7 +181,7 @@ void init()
 	mbox = new Polyhedron();
 	mbox->loadSmf("cube");
 	mbox->setModelMatrix(Translate(0,0,0)*Scale(90.0,90.0,90.0));
-	mbox->textureInit("sky.ppm", 1280, 720);
+	mbox->textureInit(tSky);
 	drawables.push_back(mbox);
 	
 	//orbit sun
@@ -182,12 +191,14 @@ void init()
 //Game Start
 void startGame() {
 	glutPassiveMotionFunc(setViewByMouse);
-	glutSetCursor(GLUT_CURSOR_NONE);
+	glutSetCursor(GLUT_CURSOR_CROSSHAIR);
 	//pizza
 		srand(time(0));
 
-	for(float i=1; i<=10; i+=2.25) {
-		drawables.push_back(new Object("pizza", Translate(0,-.9,i)));
+	for(float i=1; i<=10; i+=2.4) {
+		object = new Object();
+		object->makePizza(Translate(0,-.9,i));
+		drawables.push_back(object);
 	}
 }
 
@@ -226,7 +237,7 @@ void click(int button, int state, int x, int y) {
 
 	if(isAtMainMenu && state == 1 && x >440 && x < 889 && y > 443 && y < 690) {
 		//Show loading screen
-		drawables[0]->makeTexture("pizzaBoiLoad.ppm", 1280, 720);
+		drawables[0]->updateTexture(tLoad);
 		display();
 		//Delete old game
 		drawables.clear();
@@ -235,7 +246,7 @@ void click(int button, int state, int x, int y) {
 		//Load Game
 		isAtMainMenu = false;
 		cam = &cam1;
-		drawables[0]->makeTexture("pizzaBoiDeath.ppm", 1280, 720);
+		drawables[0]->updateTexture(tDeath);
 
 		//START GAME
 		startGame();

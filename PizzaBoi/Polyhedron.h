@@ -5,6 +5,7 @@
 #include "Drawable.h"
 #include "Camera.h"
 #include "Light.h"
+#include "Texture.h"
 #include <ctime>
 #include <cstdlib>
 #include <string>
@@ -26,7 +27,8 @@ public:
 	Polyhedron(vector<vec4> verts);
 
 	void init();
-	void textureInit(char * name, int width, int height);
+	void textureInit(Texture t);
+	void updateTexture(Texture t);
 	void addVert(vec4 v);
 	void addVert(vec4 v, vec4 c);
 	void draw(Camera, vector<Light*>);
@@ -38,7 +40,6 @@ private:
 	void buildPolyhedron();
 	void buildCube();
 	void calcNormals();
-	void makeTexture(char * name, int width, int height);
 	void makeQuad(GLuint a, GLuint b, GLuint c, GLuint d);
 	GLuint vPosition;
 	GLuint vColor;
@@ -48,8 +49,8 @@ private:
 	GLuint cmLoc;
 	GLuint pmLoc;
 	GLuint texLoc;
-	GLuint npos;
 	GLuint texture;
+	GLuint npos;
 	GLuint diffuse_loc;
 	GLuint spec_loc;
 	GLuint ambient_loc;
