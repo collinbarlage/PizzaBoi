@@ -193,8 +193,11 @@ void startGame() {
 
 void kill() {
 	isAtMainMenu = true;
-	cam = &cam2;
+	//undo fps camera
 	glutSetCursor(GLUT_CURSOR_INHERIT);
+	cam2 = Camera(vec4(0,-10,0,1), vec4(1,-10,0,1), vec4(0,1,0,1));
+	cam = &cam2;
+
 
 }
 
@@ -218,7 +221,6 @@ void resize(int w, int h) {
 
 void click(int button, int state, int x, int y) {
 	srand(time(NULL));
-	cout << "time:" << time(NULL) << endl;
 
 	if(isAtMainMenu && state == 1 && x >440 && x < 889 && y > 443 && y < 690) {
 		//Show loading screen
