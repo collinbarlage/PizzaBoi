@@ -4,6 +4,7 @@
 Object::Object(float r) {
 	seed = r;
 	x = y = z = 0;
+	isAnimating = false;
 }
 
 
@@ -40,6 +41,28 @@ void Object::translate(GLfloat tX, GLfloat tY, GLfloat tZ) {
 void Object::spawn(GLfloat sX, GLfloat sY, GLfloat sZ) {
 	translate(-x,-y,-z);
 	translate(sX,sY,sZ);
+}
+
+void Object::animate() {
+	if(isAnimating) {
+		for(int i=0; i<polyhedrons.size(); i++) {
+			//polyhedrons[i]->setModelMatrix(Translate(x+movePath.x/100,y+movePath.y/100,z+movePath.z/100)*RotateY(spin)*Translate(-x,-y,-z));
+			polyhedrons[i]->setModelMatrix(Translate(movePath.x,movePath.y,movePath.z));
+		}
+	}
+	x += movePath.x;
+	y += movePath.y;
+	z += movePath.z;
+}
+
+void Object::setAnimation(vec3 v, GLfloat s) {
+	movePath = v;
+	spin = s;
+	isAnimating = true;
+}
+
+void Object::stopAnimation() {
+	isAnimating = false;
 }
 
 void Object::makePizza(GLfloat tX, GLfloat tY, GLfloat tZ) {

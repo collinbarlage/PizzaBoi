@@ -29,8 +29,7 @@ public:
 	void init();
 	void textureInit(Texture t);
 	void updateTexture(Texture t);
-	void addVert(vec4 v);
-	void addVert(vec4 v, vec4 c);
+
 	void draw(Camera, vector<Light*>);
 	void makeWireframe();
 	void loadSmf(string filename);
@@ -41,6 +40,8 @@ private:
 	void buildCube();
 	void calcNormals();
 	void makeQuad(GLuint a, GLuint b, GLuint c, GLuint d);
+	void addVert(vec4 v);
+	void addVert(vec4 v, vec4 c);
 	GLuint vPosition;
 	GLuint vColor;
 	GLuint vNormal;

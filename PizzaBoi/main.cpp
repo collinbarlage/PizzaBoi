@@ -51,9 +51,10 @@ Camera cam2 = Camera(vec4(0,-10,0,1), vec4(1,-10,0,1), vec4(0,1,0,1));
 Camera *cam = &cam2;
 vector<Drawable*>drawables;
 
+
 //Projectiles
 int ammoIndex = 0;
-vector<Object*> ammo;
+vector<Object*> ammo;  
 
 //Lights
 vector<Light*> lights;
@@ -217,8 +218,9 @@ void firePizza(vec4 at) {
 
 	//vector of angle shot
 	vec3 angle = vec3(cos(DegreesToRadians*(cam1.yA+90)), 0, sin(DegreesToRadians*(cam1.yA+90)));
-	//drawables[ammoIndex]->setModelMatrix(Translate(-at.x, -.9,- at.z));
+	ammo[ammoIndex]->stopAnimation(); //stop previous animation if any
 	ammo[ammoIndex]->spawn(-at.x -angle.x , -0.9,- at.z-angle.z);
+	ammo[ammoIndex]->setAnimation(vec3(angle.x/-10, 0, angle.z/-10), .1);
 	//incriment ammo index
 	ammoIndex++;
 
@@ -331,8 +333,15 @@ void timerCallback(int value) {
 	orbitTime += .002;
 	if(orbitTime >= 3.1415926535) 
 		orbitTime = -3.1415926535;
-
 	sun.position = vec4(cos(orbitTime)*10, sin(orbitTime)*10, pos.z, 1);
+
+	//Move projectiles
+	for(int i=0; i<ammo.size(); i++) {
+		ammo[i]->animate();
+	}
+
+
+
 	//continue animating
 	glutTimerFunc(10, timerCallback, 0);
 	glutPostRedisplay();
