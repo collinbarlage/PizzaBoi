@@ -27,20 +27,20 @@ public:
 	void draw(Camera, vector<Light*>);
 	void updateTexture(Texture t);
 	void transform(mat4 m);
-	void makePizza(mat4=Scale(1,1,1));
-	void makeHouse(mat4=Scale(1,1,1));
+	void translate(GLfloat x, GLfloat y, GLfloat z);
+	void spawn(GLfloat x, GLfloat y, GLfloat z);
+	void makePizza(GLfloat=1, GLfloat=1, GLfloat=1);
+	void makeHouse(GLfloat=1, GLfloat=1, GLfloat=1);
 
 private:
 	Polyhedron * poly;
 	vector<Polyhedron*> polyhedrons;
 	int random(int p);
 	float seed;
-	
-	//Textures:
-	Texture tPizzaPep;
-	Texture tPizzaCheese;
-	Texture tPizzaSpecial;
-	Texture tPizzaCrust;
+
+	GLfloat x;
+	GLfloat y;
+	GLfloat z;
 	
 };
 #endif

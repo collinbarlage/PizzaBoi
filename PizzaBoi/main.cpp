@@ -10,8 +10,6 @@
 
 //Forward declarations
 void init(void);
-void startGame(void);
-void kill(void);
 void display(void);
 void keyboard(unsigned char, int, int);
 void keyboardup(unsigned char, int, int);
@@ -22,6 +20,11 @@ void resize(int width, int height);
 void close(void);
 void timerCallback(int value);
 void setViewByMouse(int x, int y);
+
+//game functions
+void startGame(void);
+void kill(void);
+void firePizza(vec4 at);
 
 
 //helper functions
@@ -49,6 +52,10 @@ Camera cam1 = Camera(vec4(0,0,0.5,1), vec4(0,0,0,1), vec4(0, 1, 0, 1));
 Camera cam2 = Camera(vec4(0,-10,0,1), vec4(1,-10,0,1), vec4(0,1,0,1));
 Camera *cam = &cam2;
 vector<Drawable*>drawables;
+
+//Projectiles
+int ammoIndex = 0;
+vector<Object*> ammo;
 
 //Lights
 vector<Light*> lights;
@@ -155,11 +162,16 @@ void init()
 	mbox->textureInit(tMainMenu);
 	drawables.push_back(mbox);
 
-	//sphere
-	sphere = new Sphere(64,vec4(5.0, 0.794, 0.886,1),vec4(0.1, 0.694, 0.986,1),vec4(0.0, 0.1, 0.2,1));
-	sphere->setModelMatrix(Translate(1,-.4,1));
-	sphere->init();
-	//drawables.push_back(sphere);
+	//pizzas
+	srand(time(0));
+	for(int i=1; i<=10; i++) {
+		object = new Object();
+		object->makePizza(0,-5,0);
+		drawables.push_back(object);
+		ammo.push_back(object);
+	}
+
+
 
 	//floor plane
 	mbox = new Polyhedron();
@@ -168,38 +180,50 @@ void init()
 	mbox->textureInit(tGrass);
 	drawables.push_back(mbox);
 
-	//totem
-	//mbox = new Polyhedron();
-	//mbox->loadObj("totem.obj", 1);
-	//mbox->setModelMatrix(Translate(-2, -.5, 1));
-	//mbox->init();
-	//mbox->setModelMatrix(Translate(0, 0, 0));
-	//drawables.push_back(mbox);
-
-
 	//skybox
 	mbox = new Polyhedron();
 	mbox->loadSmf("cube");
 	mbox->setModelMatrix(Translate(0,0,0)*Scale(90.0,90.0,90.0));
 	mbox->textureInit(tSky);
 	drawables.push_back(mbox);
-	
+
+
 	//orbit sun
 	timerCallback(0);
 }
 
 //Game Start
 void startGame() {
+	//Show loading screen
+	drawables[0]->updateTexture(tLoad);
+	display();
+
+	//Reset positions
+
+
+	//Load Game
+	isAtMainMenu = false;
+	cam = &cam1;
+	drawables[0]->updateTexture(tDeath);
+	//set up mouse
 	glutPassiveMotionFunc(setViewByMouse);
 	glutSetCursor(GLUT_CURSOR_CROSSHAIR);
-	//pizza
-		srand(time(0));
 
-	for(float i=1; i<=10; i+=2.4) {
-		object = new Object();
-		object->makePizza(Translate(0,-.9,i));
-		drawables.push_back(object);
+
+}
+
+void firePizza(vec4 at) {
+	cout << "firing pizza @ " << at << endl;
+
+	//drawables[ammoIndex]->setModelMatrix(Translate(-at.x, -.9,- at.z));
+	ammo[ammoIndex]->spawn(-at.x, -0.9,- at.z);
+	//incriment ammo index
+	ammoIndex++;
+
+	if(ammoIndex >= 10) {
+		ammoIndex = 0;
 	}
+	cout << ammoIndex << endl;
 }
 
 void kill() {
@@ -236,23 +260,14 @@ void click(int button, int state, int x, int y) {
 	srand(time(NULL));
 
 	if(isAtMainMenu && state == 1 && x >440 && x < 889 && y > 443 && y < 690) {
-		//Show loading screen
-		drawables[0]->updateTexture(tLoad);
-		display();
-		//Delete old game
-		drawables.clear();
-		init();
-
-		//Load Game
-		isAtMainMenu = false;
-		cam = &cam1;
-		drawables[0]->updateTexture(tDeath);
-
 		//START GAME
 		startGame();
 		display();
+	} else if (state == 1){
+		//FIRE PIZZA
+		firePizza(cam1.at);
 
-	}	
+	}
 }
 
 void keyboard(unsigned char key, int x, int y)
