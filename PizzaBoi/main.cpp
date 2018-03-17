@@ -3,7 +3,6 @@
 #include "Light.h"	//for lights (for use in future assignments)
 #include "Polyhedron.h"  //blue box object!
 #include "Object.h"  //a pizza
-#include "Sphere.h"  //a ball!?
 #include "Texture.h"  //a pic
 #include <cstdlib>
 #include <ctime>
@@ -47,7 +46,6 @@ struct SpecialInput{
 //Objects
 Polyhedron* mbox;
 Object* object = new Object(); //Loads all textures for objects
-Sphere* sphere;
 Camera cam1 = Camera(vec4(0,0,0.5,1), vec4(0,0,0,1), vec4(0, 1, 0, 1));
 Camera cam2 = Camera(vec4(0,-10,0,1), vec4(1,-10,0,1), vec4(0,1,0,1));
 Camera *cam = &cam2;
@@ -214,9 +212,13 @@ void startGame() {
 
 void firePizza(vec4 at) {
 	cout << "firing pizza @ " << at << endl;
+	//adjust for camera starting at 0,0,.5
+	at.z += .5;
 
+	//vector of angle shot
+	vec3 angle = vec3(cos(DegreesToRadians*(cam1.yA+90)), 0, sin(DegreesToRadians*(cam1.yA+90)));
 	//drawables[ammoIndex]->setModelMatrix(Translate(-at.x, -.9,- at.z));
-	ammo[ammoIndex]->spawn(-at.x, -0.9,- at.z);
+	ammo[ammoIndex]->spawn(-at.x -angle.x , -0.9,- at.z-angle.z);
 	//incriment ammo index
 	ammoIndex++;
 
