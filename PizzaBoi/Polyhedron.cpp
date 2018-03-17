@@ -88,10 +88,10 @@ void Polyhedron::textureInit(Texture t) {
 
 	//put the data on the VBO
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(points)*points.size()*3, NULL, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(points)*points.size() + sizeof(normals)*normals.size() + sizeof(textureCoords)*textureCoords.size(), NULL, GL_STATIC_DRAW);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(points)*points.size(), &points[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, sizeof(points)*points.size(), sizeof(points)*points.size(), &normals[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, sizeof(points)*points.size()*2, sizeof(points)*points.size(), &textureCoords[0]);
+	glBufferSubData(GL_ARRAY_BUFFER, sizeof(points)*points.size(), sizeof(normals)*normals.size(), &normals[0]);
+	glBufferSubData(GL_ARRAY_BUFFER, sizeof(points)*points.size()+ sizeof(normals)*normals.size(), sizeof(textureCoords)*textureCoords.size(), &textureCoords[0]);
 
 	//set up stuff for the body of the Polyhedron
 	glGenVertexArrays(1, &VAO);
