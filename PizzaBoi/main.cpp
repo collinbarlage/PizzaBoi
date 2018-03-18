@@ -47,6 +47,7 @@ struct SpecialInput{
 //Objects
 Polyhedron* mbox;
 Object* object = new Object(); //Loads all textures for objects
+Object* house = new Object(); //Loads all textures for objects
 Sphere* sphere;
 Camera cam1 = Camera(vec4(0,0,0.5,1), vec4(0,0,0,1), vec4(0, 1, 0, 1));
 Camera cam2 = Camera(vec4(0,-10,0,1), vec4(1,-10,0,1), vec4(0,1,0,1));
@@ -170,6 +171,11 @@ void init()
 		drawables.push_back(object);
 		ammo.push_back(object);
 	}
+
+	house = new Object();
+	object->makeHouse(5,0,0);
+	drawables.push_back(object);
+
 
 
 

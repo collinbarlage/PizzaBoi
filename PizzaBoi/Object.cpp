@@ -45,14 +45,14 @@ void Object::spawn(GLfloat sX, GLfloat sY, GLfloat sZ) {
 void Object::makePizza(GLfloat tX, GLfloat tY, GLfloat tZ) {
 	polyhedrons.clear();
 	//Load textures
-	Texture tPizzaPep = Texture("./objects/pizzaPep.ppm", 1280, 720);
-	Texture tPizzaCheese = Texture("./objects/pizzaCheese.ppm", 1280, 720);
-	Texture tPizzaSpecial = Texture("./objects/pizzaSpecial.ppm", 1280, 720);
-	Texture tPizzaCrust = Texture("./objects/pizzaCrust.ppm", 1280, 720);
+	Texture tPizzaPep = Texture("./objects/pizza/pizzaPep.ppm", 1280, 720);
+	Texture tPizzaCheese = Texture("./objects/pizza/pizzaCheese.ppm", 1280, 720);
+	Texture tPizzaSpecial = Texture("./objects/pizza/pizzaSpecial.ppm", 1280, 720);
+	Texture tPizzaCrust = Texture("./objects/pizza/pizzaCrust.ppm", 1280, 720);
 
 	//Topping
 	poly = new Polyhedron();
-	poly->loadObj("./objects/pizzaTop.obj", .2);
+	poly->loadObj("./objects/pizza/pizzaTop.obj", .2);
 	switch(random(3)) {
 	case 1:	
 		poly->textureInit(tPizzaPep);
@@ -67,12 +67,12 @@ void Object::makePizza(GLfloat tX, GLfloat tY, GLfloat tZ) {
 	polyhedrons.push_back(poly);
 	//Crust
 	poly = new Polyhedron();
-	poly->loadObj("./objects/pizzaCrust.obj", .2);
+	poly->loadObj("./objects/pizza/pizzaCrust.obj", .2);
 	poly->textureInit(tPizzaCrust);
 	polyhedrons.push_back(poly);
 	//Bottom
 	poly = new Polyhedron();
-	poly->loadObj("./objects/pizzaBottom.obj", .2);
+	poly->loadObj("./objects/pizza/pizzaBottom.obj", .2);
 	poly->textureInit(tPizzaCrust);
 	polyhedrons.push_back(poly);
 
@@ -80,11 +80,85 @@ void Object::makePizza(GLfloat tX, GLfloat tY, GLfloat tZ) {
 }
 
 void Object::makeHouse(GLfloat tX, GLfloat tY, GLfloat tZ) {
-	//TODO: model a haus!
-
+	polyhedrons.clear();
 	//Load textures
+	Texture tPizzaPep = Texture("./objects/pizza/pizzaPep.ppm", 1280, 720);
+	Texture tPizzaCheese = Texture("./objects/pizza/pizzaCheese.ppm", 1280, 720);
+	Texture tPizzaSpecial = Texture("./objects/pizza/pizzaSpecial.ppm", 1280, 720);
+	Texture tPizzaCrust = Texture("./objects/pizza/pizzaCrust.ppm", 1280, 720);
+	Texture redBoards = Texture("./objects/house/red_boards.ppm", 1280, 720);
+	Texture bricks = Texture("./objects/house/bricks.ppm", 1280, 720);
+	Texture chimney = Texture("./objects/house/chimney.ppm", 1280, 720);
+	Texture white = Texture("./objects/house/white_wall.ppm", 1280, 720);
+	Texture drywall = Texture("./objects/house/dry_wall.ppm", 1280, 720);
+	Texture door = Texture("./objects/house/door.ppm", 1280, 720);
+	Texture window = Texture("./objects/house/window.ppm", 1280, 720);
 
-	//...
+	//House Base
+	poly = new Polyhedron();
+	poly->loadObj("./objects/house/house_base.obj", .2);
+	poly->textureInit(drywall);
+	polyhedrons.push_back(poly);
+	//Roof
+	poly = new Polyhedron();
+	poly->loadObj("./objects/house/roof.obj", .2);
+	poly->textureInit(redBoards);
+	polyhedrons.push_back(poly);
+	//Steps
+	poly = new Polyhedron();
+	poly->loadObj("./objects/house/steps.obj", .2);
+	poly->init();
+	polyhedrons.push_back(poly);
+	//Steps
+	poly = new Polyhedron();
+	poly->loadObj("./objects/house/chimney.obj", .2);
+	poly->textureInit(chimney);
+	polyhedrons.push_back(poly);
+	//door_handle_base
+	poly = new Polyhedron();
+	poly->loadObj("./objects/house/door_handle_base.obj", .2);
+	poly->textureInit(tPizzaCheese);
+	polyhedrons.push_back(poly);
+	//door_base
+	poly = new Polyhedron();
+	poly->loadObj("./objects/house/door_base.obj", .2);
+	poly->textureInit(door);
+	polyhedrons.push_back(poly);
+	//door_handle
+	poly = new Polyhedron();
+	poly->loadObj("./objects/house/door_handle.obj", .2);
+	poly->textureInit(tPizzaCheese);
+	polyhedrons.push_back(poly);
+	//window 1
+	poly = new Polyhedron();
+	poly->loadObj("./objects/house/window1.obj", .2);
+	poly->textureInit(window);
+	polyhedrons.push_back(poly);
+	//window 2
+	poly = new Polyhedron();
+	poly->loadObj("./objects/house/window2.obj", .2);
+	poly->textureInit(window);
+	polyhedrons.push_back(poly);
+	//window 3
+	poly = new Polyhedron();
+	poly->loadObj("./objects/house/window3.obj", .2);
+	poly->textureInit(window);
+	polyhedrons.push_back(poly);
+	//window 4
+	poly = new Polyhedron();
+	poly->loadObj("./objects/house/window4.obj", .2);
+	poly->textureInit(window);
+	polyhedrons.push_back(poly);
+	//window 5
+	poly = new Polyhedron();
+	poly->loadObj("./objects/house/window5.obj", .2);
+	poly->textureInit(window);
+	polyhedrons.push_back(poly);
+	//window 6
+	poly = new Polyhedron();
+	poly->loadObj("./objects/house/window6.obj", .2);
+	poly->textureInit(window);
+	polyhedrons.push_back(poly);
 
 	translate(tX,tY,tZ);
 }
