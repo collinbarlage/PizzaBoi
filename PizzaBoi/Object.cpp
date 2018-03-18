@@ -41,18 +41,26 @@ void Object::translate(GLfloat tX, GLfloat tY, GLfloat tZ) {
 void Object::spawn(GLfloat sX, GLfloat sY, GLfloat sZ) {
 	translate(-x,-y,-z);
 	translate(sX,sY,sZ);
+	x = sX;
+	y = sY;
+	z = sZ;
 }
 
 void Object::animate() {
 	if(isAnimating) {
 		for(int i=0; i<polyhedrons.size(); i++) {
-			//polyhedrons[i]->setModelMatrix(Translate(x+movePath.x/100,y+movePath.y/100,z+movePath.z/100)*RotateY(spin)*Translate(-x,-y,-z));
 			polyhedrons[i]->setModelMatrix(Translate(movePath.x,movePath.y,movePath.z));
+			
+			//TODO: rotation is so F'd. fixx dis shite
+			//polyhedrons[i]->setModelMatrix(Translate(movePath.x,movePath.y,movePath.z)*Translate(x,y,z)*RotateY(spin)*Translate(-x,-y,-z));
 		}
+		x += movePath.x;
+		y += movePath.y;
+		z += movePath.z;
+
+		//TODO: if object is super far away stop animating it
 	}
-	x += movePath.x;
-	y += movePath.y;
-	z += movePath.z;
+
 }
 
 void Object::setAnimation(vec3 v, GLfloat s) {

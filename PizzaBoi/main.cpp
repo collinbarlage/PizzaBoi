@@ -45,7 +45,7 @@ struct SpecialInput{
 
 //game functions
 void startGame(void);
-void kill(void);
+void die(void);
 void firePizza(vec4 at);
 
 //helper functions
@@ -199,9 +199,6 @@ void startGame() {
 	drawables[0]->updateTexture(tLoad);
 	display();
 
-	//Reset positions
-	//TODO: Move all objects (ammo[], )back underground
-
 	//Load Game
 	isAtMainMenu = false;
 	cam = &cam1;
@@ -210,14 +207,12 @@ void startGame() {
 	//set up mouse
 	glutPassiveMotionFunc(setViewByMouse);
 	glutSetCursor(GLUT_CURSOR_CROSSHAIR);
-
-
 }
 
 void firePizza(vec4 at) {
 	cout << "firing pizza at " << at << endl;
-	//speed - (10 is slow, 1 is fast)
-	int speed = 1;
+	//adjust speed here
+	int speed = 3; //1 is fast af, 10 is slowww
 
 	//adjust for camera starting at 0,0,.5
 	at.z += .5;
@@ -226,17 +221,14 @@ void firePizza(vec4 at) {
 	//trigger animation
 	ammo[ammoIndex]->stopAnimation(); //stop previous animation if any
 	ammo[ammoIndex]->spawn(-at.x -angle.x , -0.9,- at.z-angle.z);
-	ammo[ammoIndex]->setAnimation(vec3(angle.x/-speed, 0, angle.z/-speed), .1);
+	ammo[ammoIndex]->setAnimation(vec3(angle.x/-speed, 0, angle.z/-speed), 1);
 	//incriment ammo index
 	ammoIndex++;
-
-	if(ammoIndex >= 10) {
+	if(ammoIndex >= 10) //only allow 10 pizzas on screen at once
 		ammoIndex = 0;
-	}
-	cout << ammoIndex << endl;
 }
 
-void kill() {
+void die() { //call when player dies
 	isAtMainMenu = true;
 	//undo fps camera
 	glutSetCursor(GLUT_CURSOR_INHERIT);
@@ -245,6 +237,8 @@ void kill() {
 	cam2 = Camera(vec4(0,-10,0,1), vec4(1,-10,0,1), vec4(0,1,0,1));
 	cam = &cam2;
 
+	//Reset positions
+	//TODO: Move all objects (ammo[], )back underground
 
 }
 
@@ -265,7 +259,6 @@ void resize(int w, int h) {
 	glViewport(0, 0, (GLsizei)w, (GLsizei)h);  //make the viewport the entire window
 }
 
-
 void click(int button, int state, int x, int y) {
 	srand(time(NULL));
 
@@ -280,13 +273,12 @@ void click(int button, int state, int x, int y) {
 	}
 }
 
-void keyboard(unsigned char key, int x, int y)
-{
+void keyboard(unsigned char key, int x, int y)	{
 	//put keys here that aren't meant to be held down / animated
 	if(key == 'q' || key == 'Q') close();
 	if (key == 'p' || key == 'P') cam->toggleProj();
 	if (key == ' ') {
-		kill();
+		die();
 	}
 	toggleKey(key, true);
 }
@@ -294,7 +286,6 @@ void keyboard(unsigned char key, int x, int y)
 void keyboardup(unsigned char key, int x, int y)
 {
 	if (key == 'q' || key == 'Q') close();
-	
 	toggleKey(key, false);
 }
 
@@ -327,7 +318,6 @@ void toggleSpecialInput(int key, bool toggle){
 };
 
 
-
 //----------------------------------------------------------------------------
 //Timer  callback
 void timerCallback(int value) {
@@ -347,8 +337,7 @@ void timerCallback(int value) {
 	}
 
 
-
-	//continue animating
+	//continue animating...
 	glutTimerFunc(10, timerCallback, 0);
 	glutPostRedisplay();
 }
@@ -394,7 +383,6 @@ void close(){
 
 	if(windowID>0)
 			glutDestroyWindow(windowID);
-
     exit(EXIT_SUCCESS);
 }
 
