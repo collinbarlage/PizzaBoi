@@ -1,12 +1,24 @@
+//-----------------------------//
+//        ~ PIZZA BOI ~	       //
+//  A WONDER TWINZ PRODUCTION  //
+//-----------------------------//
+//	~ � 2018 Wonder Twinz	   //
+//	~ MATTHEW WAGAR			  //
+//	~ COLLIN BARLAGE		 //
+//--------------------------//
+
 #include "Angel.h"  //includes gl.h, glut.h and other stuff...
 #include "Camera.h"  //for camera objects (for use in future assignments)
 #include "Light.h"	//for lights (for use in future assignments)
 #include "Polyhedron.h"  //blue box object!
 #include "Object.h"  //a pizza
-#include "Sphere.h"  //a ball!?
 #include "Texture.h"  //a pic
 #include <cstdlib>
 #include <ctime>
+
+//Screen size
+int SCREENWIDTH = 1280;
+int SCREENHEIGHT = 720;
 
 //Forward declarations
 void init(void);
@@ -21,18 +33,6 @@ void close(void);
 void timerCallback(int value);
 void setViewByMouse(int x, int y);
 
-//game functions
-void startGame(void);
-void kill(void);
-void firePizza(vec4 at);
-
-
-//helper functions
-void toggleKey(unsigned char key, bool toggle);
-void toggleSpecialInput(int key, bool toggle);
-void animateKeys();
-
-
 struct Key{
 	char key;
 	bool pressed;
@@ -43,6 +43,15 @@ struct SpecialInput{
 	bool pressed;
 };
 
+//game functions
+void startGame(void);
+void die(void);
+void firePizza(vec4 at);
+
+//helper functions
+void toggleKey(unsigned char key, bool toggle);
+void toggleSpecialInput(int key, bool toggle);
+void animateKeys();
 
 //Objects
 Polyhedron* mbox;
@@ -56,7 +65,7 @@ vector<Drawable*>drawables;
 
 //Projectiles
 int ammoIndex = 0;
-vector<Object*> ammo;
+vector<Object*> ammo;  
 
 //Lights
 vector<Light*> lights;
@@ -70,7 +79,6 @@ Texture tLoad = Texture("pizzaBoiLoad.ppm", 1280, 720);
 Texture tDeath = Texture("pizzaBoiDeath.ppm", 1280, 720);
 Texture tGrass = Texture("grass.ppm", 1280, 720);
 Texture tSky = Texture("sky.ppm", 1280, 720);
-
 
 //Helpers
 bool isAtMainMenu = true;
@@ -99,21 +107,18 @@ SpecialInput sInputs[] = {{GLUT_KEY_UP, false},
 						  {GLUT_KEY_LEFT, false},
 						  {GLUT_KEY_RIGHT, false}};
 
-//Screen size
-int SCREENWIDTH = 1280;
-int SCREENHEIGHT = 720;
-
 //----------------------------------------------------------------------------
 
 int main(int argc, char **argv)
 {
-	cout <<"PIZAA - BOI" << endl;
-	//srand(time(NULL));
+	cout <<"* PIZAA - BOI *\n  *** A WONDER TWINZ PRODUCTION ***" << endl;
+
 	//initialize GLUT
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
 	glutInitWindowSize(SCREENWIDTH, SCREENHEIGHT);
 
+	//Screen title
 	windowID = glutCreateWindow("PIZZA BOI");
 
 	//print out info about our system
@@ -128,7 +133,8 @@ int main(int argc, char **argv)
 	}
 	fprintf(stdout, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
 
-	init(); //initalize objects
+	//initalize objects
+	init(); 
 
 	//set up the callback functions
 	glutDisplayFunc(display);
@@ -144,13 +150,12 @@ int main(int argc, char **argv)
 	return 0;
 }
 
-// Initialization
+//Scene - Load all geometry off screen for spawing
 void init()
 {
 	glClearColor(1.0, 1.0, 1.0, 1.0);
 	glEnable(GL_DEPTH_TEST);
 
-//scene
 	//lights
 	lights.push_back(&sun);
 	flashlight.on = 0; //initilize flashlight to be off
@@ -163,7 +168,7 @@ void init()
 	mbox->textureInit(tMainMenu);
 	drawables.push_back(mbox);
 
-	//pizzas
+	//Spawn Pizzas
 	srand(time(0));
 	for(int i=1; i<=10; i++) {
 		object = new Object();
@@ -171,15 +176,9 @@ void init()
 		drawables.push_back(object);
 		ammo.push_back(object);
 	}
-
 	house = new Object();
 	object->makeHouse(5,0,0);
 	drawables.push_back(object);
-
-
-
-
-	//floor plane
 	mbox = new Polyhedron();
 	mbox->loadSmf("cube");
 	mbox->setModelMatrix(Translate(0,-1.5,0)*Scale(15.0,0.1,15.0));
@@ -193,7 +192,6 @@ void init()
 	mbox->textureInit(tSky);
 	drawables.push_back(mbox);
 
-
 	//orbit sun
 	timerCallback(0);
 }
@@ -204,35 +202,36 @@ void startGame() {
 	drawables[0]->updateTexture(tLoad);
 	display();
 
-	//Reset positions
-
-
 	//Load Game
 	isAtMainMenu = false;
 	cam = &cam1;
 	drawables[0]->updateTexture(tDeath);
+
 	//set up mouse
 	glutPassiveMotionFunc(setViewByMouse);
 	glutSetCursor(GLUT_CURSOR_CROSSHAIR);
-
-
 }
 
 void firePizza(vec4 at) {
-	cout << "firing pizza @ " << at << endl;
+	cout << "firing pizza at " << at << endl;
+	//adjust speed here
+	int speed = 3; //1 is fast af, 10 is slowww
 
-	//drawables[ammoIndex]->setModelMatrix(Translate(-at.x, -.9,- at.z));
-	ammo[ammoIndex]->spawn(-at.x, -0.9,- at.z);
+	//adjust for camera starting at 0,0,.5
+	at.z += .5;
+	//vector of angle shot
+	vec3 angle = vec3(cos(DegreesToRadians*(cam1.yA+90)), 0, sin(DegreesToRadians*(cam1.yA+90)));
+	//trigger animation
+	ammo[ammoIndex]->stopAnimation(); //stop previous animation if any
+	ammo[ammoIndex]->spawn(-at.x -angle.x , -0.9,- at.z-angle.z);
+	ammo[ammoIndex]->setAnimation(vec3(angle.x/-speed, 0, angle.z/-speed), 1);
 	//incriment ammo index
 	ammoIndex++;
-
-	if(ammoIndex >= 10) {
+	if(ammoIndex >= 10) //only allow 10 pizzas on screen at once
 		ammoIndex = 0;
-	}
-	cout << ammoIndex << endl;
 }
 
-void kill() {
+void die() { //call when player dies
 	isAtMainMenu = true;
 	//undo fps camera
 	glutSetCursor(GLUT_CURSOR_INHERIT);
@@ -241,6 +240,8 @@ void kill() {
 	cam2 = Camera(vec4(0,-10,0,1), vec4(1,-10,0,1), vec4(0,1,0,1));
 	cam = &cam2;
 
+	//Reset positions
+	//TODO: Move all objects (ammo[], )back underground
 
 }
 
@@ -261,7 +262,6 @@ void resize(int w, int h) {
 	glViewport(0, 0, (GLsizei)w, (GLsizei)h);  //make the viewport the entire window
 }
 
-
 void click(int button, int state, int x, int y) {
 	srand(time(NULL));
 
@@ -276,13 +276,12 @@ void click(int button, int state, int x, int y) {
 	}
 }
 
-void keyboard(unsigned char key, int x, int y)
-{
+void keyboard(unsigned char key, int x, int y)	{
 	//put keys here that aren't meant to be held down / animated
 	if(key == 'q' || key == 'Q') close();
 	if (key == 'p' || key == 'P') cam->toggleProj();
 	if (key == ' ') {
-		kill();
+		die();
 	}
 	toggleKey(key, true);
 }
@@ -290,7 +289,6 @@ void keyboard(unsigned char key, int x, int y)
 void keyboardup(unsigned char key, int x, int y)
 {
 	if (key == 'q' || key == 'Q') close();
-	
 	toggleKey(key, false);
 }
 
@@ -323,7 +321,6 @@ void toggleSpecialInput(int key, bool toggle){
 };
 
 
-
 //----------------------------------------------------------------------------
 //Timer  callback
 void timerCallback(int value) {
@@ -335,9 +332,15 @@ void timerCallback(int value) {
 	orbitTime += .002;
 	if(orbitTime >= 3.1415926535) 
 		orbitTime = -3.1415926535;
-
 	sun.position = vec4(cos(orbitTime)*10, sin(orbitTime)*10, pos.z, 1);
-	//continue animating
+
+	//Move projectiles
+	for(int i=0; i<ammo.size(); i++) {
+		ammo[i]->animate();
+	}
+
+
+	//continue animating...
 	glutTimerFunc(10, timerCallback, 0);
 	glutPostRedisplay();
 }
@@ -383,7 +386,6 @@ void close(){
 
 	if(windowID>0)
 			glutDestroyWindow(windowID);
-
     exit(EXIT_SUCCESS);
 }
 

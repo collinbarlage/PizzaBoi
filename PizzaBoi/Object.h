@@ -28,7 +28,12 @@ public:
 	void updateTexture(Texture t);
 	void transform(mat4 m);
 	void translate(GLfloat x, GLfloat y, GLfloat z);
+
 	void spawn(GLfloat x, GLfloat y, GLfloat z);
+	void setAnimation(vec3 movePath, GLfloat spin);
+	void stopAnimation();
+	void animate(); //x,y,z is translation, a is angle of rotation
+
 	void makePizza(GLfloat=1, GLfloat=1, GLfloat=1);
 	void makeHouse(GLfloat=1, GLfloat=1, GLfloat=1);
 
@@ -38,9 +43,15 @@ private:
 	int random(int p);
 	float seed;
 
+	bool isAnimating;
+	vec3 movePath;
+	GLfloat spin;
+
+	//keep track of objects location
 	GLfloat x;
 	GLfloat y;
 	GLfloat z;
+
 	
 };
 #endif

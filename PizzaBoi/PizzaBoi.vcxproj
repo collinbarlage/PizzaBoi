@@ -20,7 +20,6 @@
     <ClInclude Include="Light.h" />
     <ClInclude Include="mat.h" />
     <ClInclude Include="Quaternion.h" />
-    <ClInclude Include="Sphere.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="vec.h" />
   </ItemGroup>
@@ -41,7 +40,6 @@
     <ClCompile Include="InitShader.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Quaternion.cpp" />
-    <ClCompile Include="Sphere.cpp" />
     <ClCompile Include="Texture.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
