@@ -1,3 +1,12 @@
+//-----------------------------//
+//        ~ PIZZA BOI ~	       //
+//  A WONDER TWINZ PRODUCTION  //
+//-----------------------------//
+//	~ © 2018 Wonder Twinz	   //
+//	~ MATTHEW WAGAR			  //
+//	~ COLLIN BARLAGE		 //
+//--------------------------//
+
 #include "Angel.h"  //includes gl.h, glut.h and other stuff...
 #include "Camera.h"  //for camera objects (for use in future assignments)
 #include "Light.h"	//for lights (for use in future assignments)
@@ -6,6 +15,10 @@
 #include "Texture.h"  //a pic
 #include <cstdlib>
 #include <ctime>
+
+//Screen size
+int SCREENWIDTH = 1280;
+int SCREENHEIGHT = 720;
 
 //Forward declarations
 void init(void);
@@ -20,18 +33,6 @@ void close(void);
 void timerCallback(int value);
 void setViewByMouse(int x, int y);
 
-//game functions
-void startGame(void);
-void kill(void);
-void firePizza(vec4 at);
-
-
-//helper functions
-void toggleKey(unsigned char key, bool toggle);
-void toggleSpecialInput(int key, bool toggle);
-void animateKeys();
-
-
 struct Key{
 	char key;
 	bool pressed;
@@ -42,6 +43,15 @@ struct SpecialInput{
 	bool pressed;
 };
 
+//game functions
+void startGame(void);
+void kill(void);
+void firePizza(vec4 at);
+
+//helper functions
+void toggleKey(unsigned char key, bool toggle);
+void toggleSpecialInput(int key, bool toggle);
+void animateKeys();
 
 //Objects
 Polyhedron* mbox;
@@ -50,7 +60,6 @@ Camera cam1 = Camera(vec4(0,0,0.5,1), vec4(0,0,0,1), vec4(0, 1, 0, 1));
 Camera cam2 = Camera(vec4(0,-10,0,1), vec4(1,-10,0,1), vec4(0,1,0,1));
 Camera *cam = &cam2;
 vector<Drawable*>drawables;
-
 
 //Projectiles
 int ammoIndex = 0;
@@ -68,7 +77,6 @@ Texture tLoad = Texture("pizzaBoiLoad.ppm", 1280, 720);
 Texture tDeath = Texture("pizzaBoiDeath.ppm", 1280, 720);
 Texture tGrass = Texture("grass.ppm", 1280, 720);
 Texture tSky = Texture("sky.ppm", 1280, 720);
-
 
 //Helpers
 bool isAtMainMenu = true;
@@ -97,21 +105,18 @@ SpecialInput sInputs[] = {{GLUT_KEY_UP, false},
 						  {GLUT_KEY_LEFT, false},
 						  {GLUT_KEY_RIGHT, false}};
 
-//Screen size
-int SCREENWIDTH = 1280;
-int SCREENHEIGHT = 720;
-
 //----------------------------------------------------------------------------
 
 int main(int argc, char **argv)
 {
-	cout <<"PIZAA - BOI" << endl;
-	//srand(time(NULL));
+	cout <<"* PIZAA - BOI *\n  *** A WONDER TWINZ PRODUCTION ***" << endl;
+
 	//initialize GLUT
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
 	glutInitWindowSize(SCREENWIDTH, SCREENHEIGHT);
 
+	//Screen title
 	windowID = glutCreateWindow("PIZZA BOI");
 
 	//print out info about our system
@@ -126,7 +131,8 @@ int main(int argc, char **argv)
 	}
 	fprintf(stdout, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
 
-	init(); //initalize objects
+	//initalize objects
+	init(); 
 
 	//set up the callback functions
 	glutDisplayFunc(display);
@@ -142,13 +148,12 @@ int main(int argc, char **argv)
 	return 0;
 }
 
-// Initialization
+//Scene - Load all geometry off screen for spawing
 void init()
 {
 	glClearColor(1.0, 1.0, 1.0, 1.0);
 	glEnable(GL_DEPTH_TEST);
 
-//scene
 	//lights
 	lights.push_back(&sun);
 	flashlight.on = 0; //initilize flashlight to be off
@@ -161,7 +166,7 @@ void init()
 	mbox->textureInit(tMainMenu);
 	drawables.push_back(mbox);
 
-	//pizzas
+	//Spawn Pizzas
 	srand(time(0));
 	for(int i=1; i<=10; i++) {
 		object = new Object();
@@ -170,9 +175,7 @@ void init()
 		ammo.push_back(object);
 	}
 
-
-
-	//floor plane
+	//floor plane AKA GRASS
 	mbox = new Polyhedron();
 	mbox->loadSmf("cube");
 	mbox->setModelMatrix(Translate(0,-1.5,0)*Scale(15.0,0.1,15.0));
@@ -186,7 +189,6 @@ void init()
 	mbox->textureInit(tSky);
 	drawables.push_back(mbox);
 
-
 	//orbit sun
 	timerCallback(0);
 }
@@ -198,12 +200,13 @@ void startGame() {
 	display();
 
 	//Reset positions
-
+	//TODO: Move all objects (ammo[], )back underground
 
 	//Load Game
 	isAtMainMenu = false;
 	cam = &cam1;
 	drawables[0]->updateTexture(tDeath);
+
 	//set up mouse
 	glutPassiveMotionFunc(setViewByMouse);
 	glutSetCursor(GLUT_CURSOR_CROSSHAIR);
@@ -212,15 +215,18 @@ void startGame() {
 }
 
 void firePizza(vec4 at) {
-	cout << "firing pizza @ " << at << endl;
+	cout << "firing pizza at " << at << endl;
+	//speed - (10 is slow, 1 is fast)
+	int speed = 1;
+
 	//adjust for camera starting at 0,0,.5
 	at.z += .5;
-
 	//vector of angle shot
 	vec3 angle = vec3(cos(DegreesToRadians*(cam1.yA+90)), 0, sin(DegreesToRadians*(cam1.yA+90)));
+	//trigger animation
 	ammo[ammoIndex]->stopAnimation(); //stop previous animation if any
 	ammo[ammoIndex]->spawn(-at.x -angle.x , -0.9,- at.z-angle.z);
-	ammo[ammoIndex]->setAnimation(vec3(angle.x/-10, 0, angle.z/-10), .1);
+	ammo[ammoIndex]->setAnimation(vec3(angle.x/-speed, 0, angle.z/-speed), .1);
 	//incriment ammo index
 	ammoIndex++;
 
