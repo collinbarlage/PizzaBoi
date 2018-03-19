@@ -75,8 +75,14 @@ float orbitTime = 0;
 Texture tMainMenu = Texture("pizzaBoiMainMenu.ppm", 1280, 720);
 Texture tLoad = Texture("pizzaBoiLoad.ppm", 1280, 720);
 Texture tDeath = Texture("pizzaBoiDeath.ppm", 1280, 720);
-Texture tGrass = Texture("grass.ppm", 1280, 720);
-Texture tSky = Texture("sky.ppm", 1280, 720);
+Texture tGrass = Texture("objects/grass.ppm", 1280, 720);
+Texture tSky = Texture("objects/skyRect.ppm", 1280, 720);
+Texture tBrick = Texture("objects/brick.ppm", 1280, 720);
+Texture tStone = Texture("objects/cobblestone.ppm", 1280, 720);
+
+Texture tSnow = Texture("objects/arctic.ppm", 1280, 720);
+Texture tTiger = Texture("objects/lion.ppm", 1280, 720);
+Texture tCheeta = Texture("objects/cheeta.ppm", 1280, 720);
 
 //Helpers
 bool isAtMainMenu = true;
@@ -166,6 +172,34 @@ void init()
 	mbox->textureInit(tMainMenu);
 	drawables.push_back(mbox);
 
+	//Grass
+	mbox = new Polyhedron();
+	mbox->loadObj("objects/grass.obj", 1);
+	mbox->setModelMatrix(Translate(0,-1,0));
+	mbox->textureInit(tGrass);
+	drawables.push_back(mbox);
+
+	//Sidewalk
+	mbox = new Polyhedron();
+	mbox->loadObj("objects/sidewalk.obj", 1);
+	mbox->setModelMatrix(Translate(0,-1,0));
+	mbox->textureInit(tBrick);
+	drawables.push_back(mbox);
+
+	//Street
+	mbox = new Polyhedron();
+	mbox->loadObj("objects/street.obj", 1);
+	mbox->setModelMatrix(Translate(0,-1,0));
+	mbox->textureInit(tStone);
+	drawables.push_back(mbox);
+
+	//Skybox
+	mbox = new Polyhedron();
+	mbox->loadObj("objects/skyRect.obj", 1);
+	mbox->setModelMatrix(Scale(.2,.2,.2));
+	mbox->textureInit(tSky);
+	drawables.push_back(mbox);
+
 	//Spawn Pizzas
 	srand(time(0));
 	for(int i=1; i<=10; i++) {
@@ -175,20 +209,23 @@ void init()
 		ammo.push_back(object);
 	}
 
-	//floor plane AKA GRASS
+	/* UNCOMMENT FOR COWS!
 	mbox = new Polyhedron();
-	mbox->loadSmf("cube");
-	mbox->setModelMatrix(Translate(0,-1.5,0)*Scale(15.0,0.1,15.0));
-	mbox->textureInit(tGrass);
+	mbox->loadObj("objects/boundCow.obj", 2);
+	mbox->setModelMatrix(Translate(5,-1,-1)*RotateY(180));
+	mbox->textureInit(tTiger);
 	drawables.push_back(mbox);
-
-	//skybox
 	mbox = new Polyhedron();
-	mbox->loadSmf("cube");
-	mbox->setModelMatrix(Translate(0,0,0)*Scale(90.0,90.0,90.0));
-	mbox->textureInit(tSky);
+	mbox->loadObj("objects/boundCow.obj", 2);
+	mbox->setModelMatrix(Translate(5,-1,0)*RotateY(180));
+	mbox->textureInit(tSnow);
 	drawables.push_back(mbox);
-
+	mbox = new Polyhedron();
+	mbox->loadObj("objects/boundCow.obj", 2);
+	mbox->setModelMatrix(Translate(5,-1,1)*RotateY(180));
+	mbox->textureInit(tCheeta);
+	drawables.push_back(mbox);
+	*/
 	//orbit sun
 	timerCallback(0);
 }
