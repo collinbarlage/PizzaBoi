@@ -28,6 +28,7 @@ public:
 	void updateTexture(Texture t);
 	void transform(mat4 m);
 	void translate(GLfloat x, GLfloat y, GLfloat z);
+	void rotate(GLfloat theta);
 
 	void spawn(GLfloat x, GLfloat y, GLfloat z);
 	void setAnimation(vec3 movePath, GLfloat spin);

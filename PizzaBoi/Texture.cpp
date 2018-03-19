@@ -1,14 +1,14 @@
 #include "Texture.h"
 
 Texture::Texture() {
-	isLoaded = false;
+	loaded = false;
 }
 
 Texture::Texture(char* fileName, int x, int y) {
 	width = x;
 	height = y;
 	name = fileName;
-	isLoaded = false;
+	loaded = false;
 
 }
 
@@ -23,10 +23,12 @@ unsigned char* Texture::getImage() {
 
 void Texture::setImage(unsigned char* i) {
 	image = i;
-	isLoaded = true;
+	loaded = true;
 }
 
-
+bool Texture::isLoaded() {
+	return loaded;
+}
 
 
 unsigned char* Texture::ppmRead(char* filename, int* width, int* height) {

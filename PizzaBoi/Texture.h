@@ -14,14 +14,15 @@ public:
 
 	unsigned char* getImage();
 	void setImage(unsigned char* i);
+	bool isLoaded();
 
 	char* name;
-	bool isLoaded;
 	int width;
 	int height;
 private:
 	unsigned char* ppmRead(char* filename, int* width, int* height);
 	unsigned char* image;
+	bool loaded;
 
 	
 };

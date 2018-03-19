@@ -42,9 +42,9 @@ void Polyhedron::init() {
 
 	//put the data on the VBO
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(points)*points.size() * 2, NULL, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(points)*points.size() + sizeof(normals)*normals.size(), NULL, GL_STATIC_DRAW);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(points)*points.size(), &points[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, sizeof(points)*points.size(), sizeof(points)*points.size(), &normals[0]);
+	glBufferSubData(GL_ARRAY_BUFFER, sizeof(points)*points.size(), sizeof(normals)*normals.size(), &normals[0]);
 
 	//set up stuff for the body of the Polyhedron
 	glGenVertexArrays(1, &VAO);
@@ -111,12 +111,18 @@ void Polyhedron::textureInit(Texture t) {
 	int x = t.width;
 	int y = t.height;
 
-	if(!t.isLoaded) {
+	cout << t.isLoaded() << endl;
+	
+
+	if(!t.isLoaded()) {
 		t.setImage(ppmRead(t.name, &x, &y));
-		t.isLoaded = true;
 		cout << "loading texture" << t.name << endl;
+		cout << t.isLoaded() << endl;
 	}
+
+	//GLubyte * image = ppmRead(t.name, &x, &y);
 	GLubyte * image = t.getImage();
+	
 	
 	glGenTextures(1, &texture);
 	glActiveTexture(GL_TEXTURE0);
@@ -143,7 +149,7 @@ void Polyhedron::draw(Camera cam, vector<Light*> lights){
 	glUniformMatrix4fv(cmLoc, 1, GL_TRUE,cam.cameraMatrix);
 	glUniformMatrix4fv(pmLoc, 1, GL_TRUE,cam.projection);
 	glUniform4fv(diffuse_loc, 1, diff);
-	glUniform4fv(spec_loc, 1, spec);
+	glUniform4fv(spec_loc, 1, spec);	
 	glUniform4fv(ambient_loc, 1, ambi);
 	glUniform1f(alpha_loc, 100);
 	glUniform1i(texLoc, 0);

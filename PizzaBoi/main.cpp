@@ -2,7 +2,7 @@
 //        ~ PIZZA BOI ~	       //
 //  A WONDER TWINZ PRODUCTION  //
 //-----------------------------//
-//	~ © 2018 Wonder Twinz	   //
+//	~ ï¿½ 2018 Wonder Twinz	   //
 //	~ MATTHEW WAGAR			  //
 //	~ COLLIN BARLAGE		 //
 //--------------------------//
@@ -56,6 +56,7 @@ void animateKeys();
 //Objects
 Polyhedron* mbox;
 Object* object = new Object(); //Loads all textures for objects
+Object* house = new Object(); //Loads all textures for objects
 Camera cam1 = Camera(vec4(0,0,0.5,1), vec4(0,0,0,1), vec4(0, 1, 0, 1));
 Camera cam2 = Camera(vec4(0,-10,0,1), vec4(1,-10,0,1), vec4(0,1,0,1));
 Camera *cam = &cam2;
@@ -200,7 +201,21 @@ void init()
 	mbox->textureInit(tSky);
 	drawables.push_back(mbox);
 
-	//Spawn Pizzas
+	////Make houses left
+	//for(int i=0; i<10; i++) {
+		object = new Object();
+		object->makeHouse(9+(10*0),.5,7);
+		object->rotate(180);
+		drawables.push_back(object);
+	//}
+
+	//Make houses right
+	//for(int i=0; i<10; i++) {
+		object = new Object();
+		object->makeHouse(4+(10*0),.5,-7);
+		drawables.push_back(object);
+	//}
+		//Spawn Pizzas
 	srand(time(0));
 	for(int i=1; i<=10; i++) {
 		object = new Object();
@@ -208,6 +223,9 @@ void init()
 		drawables.push_back(object);
 		ammo.push_back(object);
 	}
+
+	
+
 
 	/* UNCOMMENT FOR COWS!
 	mbox = new Polyhedron();
