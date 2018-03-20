@@ -170,34 +170,10 @@ void Object::makeHouse(GLfloat tX, GLfloat tY, GLfloat tZ) {
 	polyhedrons.push_back(poly);
 	//window 1
 	poly = new Polyhedron();
-	poly->loadObj("./objects/house/window1.obj", scale);
+	poly->loadObj("./objects/house/windows.obj", scale);
 	poly->textureInit(window);
 	polyhedrons.push_back(poly);
-	//window 2
-	poly = new Polyhedron();
-	poly->loadObj("./objects/house/window2.obj", scale);
-	poly->textureInit(window);
-	polyhedrons.push_back(poly);
-	//window 3
-	poly = new Polyhedron();
-	poly->loadObj("./objects/house/window3.obj", scale);
-	poly->textureInit(window);
-	polyhedrons.push_back(poly);
-	//window 4
-	poly = new Polyhedron();
-	poly->loadObj("./objects/house/window4.obj", scale);
-	poly->textureInit(window);
-	polyhedrons.push_back(poly);
-	//window 5
-	poly = new Polyhedron();
-	poly->loadObj("./objects/house/window5.obj", scale);
-	poly->textureInit(window);
-	polyhedrons.push_back(poly);
-	//window 6
-	poly = new Polyhedron();
-	poly->loadObj("./objects/house/window6.obj", scale);
-	poly->textureInit(window);
-	polyhedrons.push_back(poly);
+
 
 	translate(tX,tY,tZ);
 }
