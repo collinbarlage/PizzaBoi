@@ -38,6 +38,8 @@ public:
 	void makePizza(GLfloat=1, GLfloat=1, GLfloat=1);
 	void makeHouse(GLfloat=1, GLfloat=1, GLfloat=1);
 
+	vec3 getLocation();
+
 private:
 	Polyhedron * poly;
 	vector<Polyhedron*> polyhedrons;
