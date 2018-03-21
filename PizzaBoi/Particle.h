@@ -22,7 +22,7 @@ class Particle: public Drawable{
 
 public:
 	Particle(); 
-	Particle(int size); 
+	Particle(GLfloat x, GLfloat y, GLfloat z); 
 	~Particle();
 
 	void loadObj(string filename, float scale);
@@ -39,7 +39,7 @@ private:
 	int size;
 	float speed;
 
-	void collision(int n);
+	vec4 getHouseColor();
 
 	GLuint vPosition;
 	GLuint vColor;

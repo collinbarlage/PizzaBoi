@@ -1,15 +1,15 @@
 #include "Particle.h"
 
 
-Particle::Particle(int s) {
+Particle::Particle(GLfloat x, GLfloat y, GLfloat z) {
 	speed = .1;
-	size = s;
+	size = 200;
 	
 	for(int i=0; i<size; i++) {
 		mass.push_back(1);
-		positions.push_back(vec4(2*((float)rand()/RAND_MAX)-1,2*((float)rand()/RAND_MAX)-1,2*((float)rand()/RAND_MAX)-1,1));
+		positions.push_back(Translate(x,y,z)*vec4(2*((float)rand()/RAND_MAX)-1,2*((float)rand()/RAND_MAX)-1,2*((float)rand()/RAND_MAX)-1,1));
 		velocities.push_back(speed*vec4(2*((float)rand()/RAND_MAX)-1,2*((float)rand()/RAND_MAX)-1,2*((float)rand()/RAND_MAX)-1,0));
-		colors.push_back(vec4(2*((float)rand()/RAND_MAX)-1,2*((float)rand()/RAND_MAX)-1,2*((float)rand()/RAND_MAX)-1,1));
+		colors.push_back(getHouseColor());
 	}
 	
 	//loadObj("./objects/boundCow.obj", .4);
@@ -17,6 +17,49 @@ Particle::Particle(int s) {
 
 
 Particle::~Particle(){
+
+}
+
+
+vec4 Particle::getHouseColor() {
+	int r = (int)12*(float)rand()/RAND_MAX;
+	cout << r << endl;
+	switch(r) {
+		case 0: case 1: case 2: 
+			return vec4(.737,.498,.415, 1);
+			break;
+		case 4: case 5: case 6:
+			return vec4(0.6470588,0.117647058,0.035294, 1);
+			break;
+		case 3:
+			return vec4(0.9294117,0.3725490,0.2784, 1);
+			break;
+		case 7: case 8: 
+			return vec4(0.4078,0.23137,0.066, 1);
+			break;
+		case 9: case 10: 
+			return vec4(0.839215686,1,0.833, 1);
+			break;
+		case 11: case 12: 
+			return vec4(0.99,0.898039,0.14509, 1);
+			break;
+
+	}
+	return vec4(2*((float)rand()/RAND_MAX)-1,2*((float)rand()/RAND_MAX)-1,2*((float)rand()/RAND_MAX)-1,1);
+}
+
+
+void Particle::idle() {
+	float dt = 0.0001;
+	for(int i=0; i<size;i++){
+		//positions[i] += .005;
+		positions[i] += velocities[i];
+		colors[i] -= vec4(0,0,0,-.01);
+	}
+
+	glBindVertexArray(VAO); //make this VAO active
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);  //associate the VBO with the active VAO
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(positions)*positions.size(), &positions[0]);
 
 }
 
@@ -98,15 +141,4 @@ void Particle::updateTexture(Texture t) {
 }
 
 
-void Particle::idle() {
-	float dt = 0.0001;
-	for(int i=0; i<size;i++){
-		//positions[i] += .005;
-		positions[i] += velocities[i];
-	}
 
-	glBindVertexArray(VAO); //make this VAO active
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);  //associate the VBO with the active VAO
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(positions)*positions.size(), &positions[0]);
-
-}

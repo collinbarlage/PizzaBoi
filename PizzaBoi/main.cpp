@@ -75,7 +75,7 @@ vector<Object*> houses;
 
 //Lights
 vector<Light*> lights;
-Light sun = Light(vec4(2,10,0,1),vec4(.9,.7,.5,1),vec4(1,1,1,1),vec4(.3,1,1,1));
+Light sun = Light(vec4(2,10,0,1),vec4(.8,.8,.6,1),vec4(1,1,1,1),vec4(.3,1,1,1));
 Light flashlight = Light(vec4(0,2,-2,1),vec4(.2,.1,.1,1),vec4(.3,.1,0,1),vec4(.5,.5,.1,1));
 float orbitTime = 0;
 
@@ -98,6 +98,7 @@ bool stoneSelect = false;
 mat4 getCameraMatrix();
 vec4 getCameraEye();
 GLuint windowID=0;
+int numHouses;
 
 //Put any keys here that you want to be animated when held down
 enum E_Keys {z=0, Z, xKey, X, c, C, a, s, d, w, KEYS_SIZE}; //make sure KEYS_SIZE is always last element in enum
@@ -209,18 +210,19 @@ void init()
 	drawables.push_back(mbox);
 
 
-	int numHouses = 4; //make even number plz
+	numHouses = 8; //make even number plz
 	//Make houses left
 	for(int i=0; i<numHouses/2; i++) {
 		object = new Object();
-		object->makeHouse(14+(20*i),.5,7);
+		object->makeHouse(19+(30*i),.5,7);
 		object->rotate(180);
 		drawables.push_back(object);
+		houses.push_back(object);
 	}
 	//Make houses right
 	for(int i=0; i<numHouses/2; i++) {
 		object = new Object();
-		object->makeHouse(4+(20*i),.5,-7);
+		object->makeHouse(4+(30*i),.5,-7);
 		drawables.push_back(object);
 		houses.push_back(object);
 	}
@@ -291,12 +293,6 @@ void firePizza(vec4 at) {
 	ammoIndex++;
 	if(ammoIndex >= 10) //only allow 10 pizzas on screen at once
 		ammoIndex = 0;
-
-	//make particlez
-	particle = new Particle(150);
-	particle->init();
-	particles.push_back(particle);
-	drawables.push_back(particle);
 }
 
 
@@ -313,8 +309,17 @@ void die() { //call when player dies
 	cam2 = Camera(vec4(0,-10,0,1), vec4(1,-10,0,1), vec4(0,1,0,1));
 	cam = &cam2;
 
-	//Reset positions
-	//TODO: Move all objects (ammo[], )back underground
+	//Reset houses
+	int h = 0;
+	for(int i=0; i<numHouses/2; i++) {
+		houses[h]->spawn(19+(30*i),.5,7);
+		h++;
+	}
+	//Make houses right
+	for(int i=0; i<numHouses/2; i++) {
+		houses[h]->spawn(4+(30*i),.5,-7);
+		h++;
+	}
 
 }
 
@@ -442,6 +447,13 @@ void detectCollisions(int i) {
 
 				if (distance < 2) { //THIS IS WHERE IT FINALLY COLLIDES
 					cout << "BAM" << endl;
+					//make particlez
+					particle = new Particle(p1.x, p1.y, p1.z);
+					particle->init();
+					particles.push_back(particle);
+					drawables.push_back(particle);
+					//respawn geometry
+					houses[j]->spawn(0,-5,0);
 					ammo[i]->spawn(0, -5, 0);
 					ammo[i]->stopAnimation(); //stop previous animation if any
 				}
