@@ -13,6 +13,7 @@
 #include "Polyhedron.h"  //blue box object!
 #include "Object.h"  //a pizza
 #include "Texture.h"  //a pic
+#include "Particle.h"  //a pic
 #include <cstdlib>
 #include <ctime>
 
@@ -61,6 +62,10 @@ Camera cam1 = Camera(vec4(0,0,0.5,1), vec4(0,0,0,1), vec4(0, 1, 0, 1));
 Camera cam2 = Camera(vec4(0,-10,0,1), vec4(1,-10,0,1), vec4(0,1,0,1));
 Camera *cam = &cam2;
 vector<Drawable*>drawables;
+
+//Particles
+Particle* particle;
+vector<Particle*> particles;
 
 //Projectiles
 int ammoIndex = 0;
@@ -201,21 +206,23 @@ void init()
 	mbox->textureInit(tSky);
 	drawables.push_back(mbox);
 
-	////Make houses left
-	//for(int i=0; i<10; i++) {
+
+	int numHouses = 4; //make even number plz
+	//Make houses left
+	for(int i=0; i<numHouses/2; i++) {
 		object = new Object();
-		object->makeHouse(9+(10*0),.5,7);
+		object->makeHouse(14+(20*i),.5,7);
 		object->rotate(180);
 		drawables.push_back(object);
-	//}
-
+	}
 	//Make houses right
-	//for(int i=0; i<10; i++) {
+	for(int i=0; i<numHouses/2; i++) {
 		object = new Object();
-		object->makeHouse(4+(10*0),.5,-7);
+		object->makeHouse(4+(20*i),.5,-7);
 		drawables.push_back(object);
-	//}
-		//Spawn Pizzas
+	}
+	
+	//Spawn Pizzas, Mama Mia
 	srand(time(0));
 	for(int i=1; i<=10; i++) {
 		object = new Object();
@@ -226,8 +233,8 @@ void init()
 
 	
 
-
-	/* UNCOMMENT FOR COWS!
+	//JUNGLE COWS
+	/*
 	mbox = new Polyhedron();
 	mbox->loadObj("objects/boundCow.obj", 2);
 	mbox->setModelMatrix(Translate(5,-1,-1)*RotateY(180));
@@ -253,7 +260,7 @@ void startGame() {
 	//Show loading screen
 	drawables[0]->updateTexture(tLoad);
 	display();
-
+	
 	//Load Game
 	isAtMainMenu = false;
 	cam = &cam1;
@@ -275,12 +282,23 @@ void firePizza(vec4 at) {
 	vec3 angle = vec3(cos(DegreesToRadians*(cam1.yA+90)), 0, sin(DegreesToRadians*(cam1.yA+90)));
 	//trigger animation
 	ammo[ammoIndex]->stopAnimation(); //stop previous animation if any
-	ammo[ammoIndex]->spawn(-at.x -angle.x , -0.9,- at.z-angle.z);
+	ammo[ammoIndex]->spawn(-at.x, -0.5,-at.z);
 	ammo[ammoIndex]->setAnimation(vec3(angle.x/-speed, 0, angle.z/-speed), 1);
 	//incriment ammo index
 	ammoIndex++;
 	if(ammoIndex >= 10) //only allow 10 pizzas on screen at once
 		ammoIndex = 0;
+
+	//make particlez
+	particle = new Particle(150);
+	particle->init();
+	particles.push_back(particle);
+	drawables.push_back(particle);
+}
+
+
+void makeCow() {
+
 }
 
 void die() { //call when player dies
@@ -389,6 +407,12 @@ void timerCallback(int value) {
 	//Move projectiles
 	for(int i=0; i<ammo.size(); i++) {
 		ammo[i]->animate();
+	}
+
+	//move particles
+	for(int i=0; i<particles.size(); i++) {
+		particles[i]->idle();
+		particles[i]->draw(Camera(*cam), lights);
 	}
 
 
