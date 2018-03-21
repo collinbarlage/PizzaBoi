@@ -53,6 +53,7 @@ void firePizza(vec4 at);
 void toggleKey(unsigned char key, bool toggle);
 void toggleSpecialInput(int key, bool toggle);
 void animateKeys();
+void detectCollisions(int i);
 
 //Objects
 Polyhedron* mbox;
@@ -69,7 +70,8 @@ vector<Particle*> particles;
 
 //Projectiles
 int ammoIndex = 0;
-vector<Object*> ammo;  
+vector<Object*> ammo;
+vector<Object*> houses;
 
 //Lights
 vector<Light*> lights;
@@ -220,8 +222,9 @@ void init()
 		object = new Object();
 		object->makeHouse(4+(20*i),.5,-7);
 		drawables.push_back(object);
+		houses.push_back(object);
 	}
-	
+
 	//Spawn Pizzas, Mama Mia
 	srand(time(0));
 	for(int i=1; i<=10; i++) {
@@ -407,6 +410,8 @@ void timerCallback(int value) {
 	//Move projectiles
 	for(int i=0; i<ammo.size(); i++) {
 		ammo[i]->animate();
+
+		detectCollisions(i);
 	}
 
 	//move particles
@@ -416,9 +421,33 @@ void timerCallback(int value) {
 	}
 
 
+
+
 	//continue animating...
 	glutTimerFunc(10, timerCallback, 0);
 	glutPostRedisplay();
+}
+
+void detectCollisions(int i) {
+	for (int j = 0; j < houses.size(); j++) {
+		vec3 p1 = ammo[i]->getLocation();
+		vec3 p2 = houses[j]->getLocation();
+
+		vec3 houseSquare[] = { vec3(p2.x + 2, p2.y, p2.z + 1.5), vec3(p2.x - 2, p2.y, p2.z + 1.5), vec3(p2.x - 2, p2.y, p2.z - 1.5), vec3(p2.x + 2, p2.y, p2.z - 1.5) };
+		float distance = sqrt(pow((p2.x - p1.x), 2) + pow((p2.y - p1.y), 2) + pow((p2.z - p1.z), 2));
+
+		if (distance < 4) { //if its in the hitbox range
+			for (int k = 0; k < 4; k++) {
+				distance = sqrt(pow((houseSquare[k].x - p1.x), 2) + pow((houseSquare[k].y - p1.y), 2) + pow((houseSquare[k].z - p1.z), 2));
+
+				if (distance < 2) { //THIS IS WHERE IT FINALLY COLLIDES
+					cout << "BAM" << endl;
+					ammo[i]->spawn(0, -5, 0);
+					ammo[i]->stopAnimation(); //stop previous animation if any
+				}
+			}
+		}
+	}
 }
 
 //Holds all keys and their animations. Meant for the timerCallback function

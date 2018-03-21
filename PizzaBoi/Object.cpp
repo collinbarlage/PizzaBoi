@@ -175,6 +175,7 @@ void Object::makeHouse(GLfloat tX, GLfloat tY, GLfloat tZ) {
 	poly->textureInit(window);
 	polyhedrons.push_back(poly);
 
+	//Create a hit box
 
 	translate(tX,tY,tZ);
 }
@@ -187,4 +188,8 @@ int Object::random(int p) {
 
 void Object::updateTexture(Texture t) {
 	//abstract
+}
+
+vec3 Object::getLocation() {
+	return vec3(x, y, z);
 }
