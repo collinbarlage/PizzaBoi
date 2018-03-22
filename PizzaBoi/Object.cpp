@@ -119,15 +119,13 @@ void Object::makeHouse(GLfloat tX, GLfloat tY, GLfloat tZ) {
 	x = y = z = 0;
 	polyhedrons.clear();
 	//Load textures
-	Texture tPizzaPep = Texture("./objects/pizza/pizzaPep.ppm", 1280, 720);
 	Texture tPizzaCheese = Texture("./objects/pizza/pizzaCheese.ppm", 1280, 720);
-	Texture tPizzaSpecial = Texture("./objects/pizza/pizzaSpecial.ppm", 1280, 720);
-	Texture tPizzaCrust = Texture("./objects/pizza/pizzaCrust.ppm", 1280, 720);
-	Texture redBoards = Texture("./objects/house/red_boards.ppm", 1280, 720);
+	Texture roof = Texture("./objects/house/roof3.ppm", 1280, 720);
 	Texture bricks = Texture("./objects/house/bricks.ppm", 1280, 720);
 	Texture chimney = Texture("./objects/house/chimney.ppm", 1280, 720);
-	Texture white = Texture("./objects/house/white_wall.ppm", 1280, 720);
-	Texture drywall = Texture("./objects/house/dry_wall.ppm", 1280, 720);
+	//Texture white = Texture("./objects/house/white_wall.ppm", 1280, 720);
+	//Texture drywall = Texture("./objects/house/dry_wall.ppm", 1280, 720);
+	Texture woodwall = Texture("./objects/house/wood4.ppm", 1280, 720);
 	Texture door = Texture("./objects/house/door.ppm", 1280, 720);
 	Texture window = Texture("./objects/house/window.ppm", 1280, 720);
 
@@ -136,12 +134,12 @@ void Object::makeHouse(GLfloat tX, GLfloat tY, GLfloat tZ) {
 	//House Base
 	poly = new Polyhedron();
 	poly->loadObj("./objects/house/house_base.obj", scale);
-	poly->textureInit(drywall);
+	poly->textureInit(woodwall);
 	polyhedrons.push_back(poly);
 	//Roof
 	poly = new Polyhedron();
 	poly->loadObj("./objects/house/roof.obj", scale);
-	poly->textureInit(redBoards);
+	poly->textureInit(roof);
 	polyhedrons.push_back(poly);
 	//Steps
 	poly = new Polyhedron();
