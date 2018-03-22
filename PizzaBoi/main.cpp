@@ -218,7 +218,7 @@ void init()
 	drawables.push_back(mbox);
 
 
-	numHouses = 2; //make even number plz
+	numHouses = 6; //make even number plz
 	//Make houses left
 	for(int i=0; i<numHouses/2; i++) {
 		object = new Object();
@@ -246,7 +246,7 @@ void init()
 	}
 
 	//skullz
-	numMob = 20;
+	numMob = 40;
 	cout << "skullz...";
 	for(int i=0; i<numMob; i++) {
 		object = new Object();
@@ -355,7 +355,6 @@ void click(int button, int state, int x, int y) {
 	} else if (state == 1){
 		//FIRE PIZZA
 		firePizza(cam1.at);
-
 	}
 }
 
@@ -418,7 +417,7 @@ void timerCallback(int value) {
 	sun.position = vec4(cos(orbitTime)*10, sin(orbitTime)*10, pos.z, 1);
 
 	//Spawn mob
-	if(!isAtMainMenu && t%50 == 0) { //spawn rate
+	if(!isAtMainMenu && t%20 == 0) { //spawn rate
 		spawnMob(t, cam1.at);
 	}
 
@@ -494,7 +493,6 @@ void detectCollisions(int i) {
 				distance = sqrt(pow((houseSquare[k].x - p1.x), 2) + pow((houseSquare[k].y - p1.y), 2) + pow((houseSquare[k].z - p1.z), 2));
 
 				if (distance < 2) { //THIS IS WHERE IT FINALLY COLLIDES
-					cout << "BAM" << endl;
 					//make particlez
 					particle = new Particle(p1.x, p1.y, p1.z,false);
 					particle->init();

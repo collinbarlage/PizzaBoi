@@ -31,7 +31,6 @@ Particle::~Particle(){
 
 vec4 Particle::getHouseColor() {
 	int r = (int)12*(float)rand()/RAND_MAX;
-	cout << r << endl;
 	switch(r) {
 		case 0: case 1: case 2: 
 			return vec4(.737,.498,.415, 1);
