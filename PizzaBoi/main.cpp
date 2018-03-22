@@ -218,7 +218,7 @@ void init()
 	drawables.push_back(mbox);
 
 
-	numHouses = 8; //make even number plz
+	numHouses = 2; //make even number plz
 	//Make houses left
 	for(int i=0; i<numHouses/2; i++) {
 		object = new Object();
@@ -277,7 +277,6 @@ void startGame() {
 }
 
 void firePizza(vec4 at) {
-	cout << "firing pizza at " << at << endl;
 	//adjust speed here
 	int speed = 3; //1 is fast af, 10 is slowww
 
@@ -419,7 +418,7 @@ void timerCallback(int value) {
 	sun.position = vec4(cos(orbitTime)*10, sin(orbitTime)*10, pos.z, 1);
 
 	//Spawn mob
-	if(t%50 == 0) { //spawn rate
+	if(!isAtMainMenu && t%50 == 0) { //spawn rate
 		spawnMob(t, cam1.at);
 	}
 
@@ -453,19 +452,11 @@ void detectMobCollisions(int i) {
 	vec3 p1 = mob[i]->getLocation();
 	vec3 p2 = vec3(-cam1.at.x, cam1.at.y,-cam1.at.z);
 
-	vec3 houseSquare[] = { vec3(p2.x + 2, p2.y, p2.z + 1.5), vec3(p2.x - 2, p2.y, p2.z + 1.5), vec3(p2.x - 2, p2.y, p2.z - 1.5), vec3(p2.x + 2, p2.y, p2.z - 1.5) };
 	float distance = sqrt(pow((p2.x - p1.x), 2) + pow((p2.y - p1.y), 2) + pow((p2.z - p1.z), 2));
-
-	if (distance < 4) { //if its in the hitbox range
-		for (int k = 0; k < 4; k++) {
-			distance = sqrt(pow((houseSquare[k].x - p1.x), 2) + pow((houseSquare[k].y - p1.y), 2) + pow((houseSquare[k].z - p1.z), 2));
-
-			if (distance < 2) { //THIS IS WHERE IT FINALLY COLLIDES
-				cout << "UR DEAD" << endl;
-				die();
-			}
-		}
+	if (distance < 1) { //THIS IS WHERE IT FINALLY COLLIDES
+		die();
 	}
+
 }
 
 
@@ -475,26 +466,19 @@ void detectCollisions(int i) {
 		vec3 p1 = ammo[i]->getLocation();
 		vec3 p2 = mob[j]->getLocation();
 
-		vec3 houseSquare[] = { vec3(p2.x + 2, p2.y, p2.z + 1.5), vec3(p2.x - 2, p2.y, p2.z + 1.5), vec3(p2.x - 2, p2.y, p2.z - 1.5), vec3(p2.x + 2, p2.y, p2.z - 1.5) };
 		float distance = sqrt(pow((p2.x - p1.x), 2) + pow((p2.y - p1.y), 2) + pow((p2.z - p1.z), 2));
 
-		if (distance < 4) { //if its in the hitbox range
-			for (int k = 0; k < 4; k++) {
-				distance = sqrt(pow((houseSquare[k].x - p1.x), 2) + pow((houseSquare[k].y - p1.y), 2) + pow((houseSquare[k].z - p1.z), 2));
+		if (distance < 1.5) { //if its in the hitbox range
 
-				if (distance < 2) { //THIS IS WHERE IT FINALLY COLLIDES
-					cout << "BAM" << endl;
-					//make particlez
-					particle = new Particle(p1.x, p1.y, p1.z,true);
-					particle->init();
-					particles.push_back(particle);
-					drawables.push_back(particle);
-					//respawn geometry
-					mob[j]->spawn(0,-20,0);
-					ammo[i]->spawn(0, -5, 0);
-					ammo[i]->stopAnimation(); //stop previous animation if any
-				}
-			}
+				//make particlez
+				particle = new Particle(p1.x, p1.y, p1.z,true);
+				particle->init();
+				particles.push_back(particle);
+				drawables.push_back(particle);
+				//respawn geometry
+				mob[j]->spawn(0,-20,0);
+				ammo[i]->spawn(0, -5, 0);
+				ammo[i]->stopAnimation(); //stop previous animation if any
 		}
 	}
 	//pizza->houses

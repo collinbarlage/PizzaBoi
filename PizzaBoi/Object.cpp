@@ -196,7 +196,6 @@ void Object::makeHouse(GLfloat tX, GLfloat tY, GLfloat tZ) {
 
 int Object::random(int p) {
 	int r = int(((float) rand() / RAND_MAX *p))+1;
-	cout << r << endl;
 	return r;
 }
 
