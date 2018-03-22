@@ -77,9 +77,24 @@ void Object::stopAnimation() {
 	isAnimating = false;
 }
 
+void Object::makeSkull(GLfloat tX, GLfloat tY, GLfloat tZ) {
+	x = y = z = 0;
+	polyhedrons.clear();
+	float scale = .5;
+
+	poly = new Polyhedron();
+	poly->loadObj("./objects/lowPolySkull.obj", scale);
+	poly->init();
+	polyhedrons.push_back(poly);
+
+
+	translate(tX,tY,tZ);
+}
+
 void Object::makePizza(GLfloat tX, GLfloat tY, GLfloat tZ) {
 	x = y = z = 0;
 	polyhedrons.clear();
+	float scale = .18;
 	//Load textures
 	Texture tPizzaPep = Texture("./objects/pizza/pizzaPep.ppm", 1280, 720);
 	Texture tPizzaCheese = Texture("./objects/pizza/pizzaCheese.ppm", 1280, 720);
@@ -88,7 +103,7 @@ void Object::makePizza(GLfloat tX, GLfloat tY, GLfloat tZ) {
 
 	//Topping
 	poly = new Polyhedron();
-	poly->loadObj("./objects/pizza/pizzaTop.obj", .2);
+	poly->loadObj("./objects/pizza/pizzaTop.obj", scale);
 	switch(random(3)) {
 	case 1:	
 		poly->textureInit(tPizzaPep);
@@ -103,14 +118,14 @@ void Object::makePizza(GLfloat tX, GLfloat tY, GLfloat tZ) {
 	polyhedrons.push_back(poly);
 	//Crust
 	poly = new Polyhedron();
-	poly->loadObj("./objects/pizza/pizzaCrust.obj", .2);
+	poly->loadObj("./objects/pizza/pizzaCrust.obj", scale);
 	poly->textureInit(tPizzaCrust);
 	polyhedrons.push_back(poly);
 	//Bottom
-	poly = new Polyhedron();
-	poly->loadObj("./objects/pizza/pizzaBottom.obj", .2);
-	poly->textureInit(tPizzaCrust);
-	polyhedrons.push_back(poly);
+	//poly = new Polyhedron();
+	//poly->loadObj("./objects/pizza/pizzaBottom.obj", scale);
+	//poly->textureInit(tPizzaCrust);
+	//polyhedrons.push_back(poly);
 
 	translate(tX,tY,tZ);
 }
@@ -179,7 +194,6 @@ void Object::makeHouse(GLfloat tX, GLfloat tY, GLfloat tZ) {
 
 int Object::random(int p) {
 	int r = int(((float) rand() / RAND_MAX *p))+1;
-	cout << r << endl;
 	return r;
 }
 

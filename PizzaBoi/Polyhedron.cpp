@@ -37,8 +37,8 @@ void Polyhedron::init() {
 	assert((cmLoc = glGetUniformLocation(program, "camera_matrix")) != -1);
 	assert((pmLoc = glGetUniformLocation(program, "proj_matrix")) != -1);
 
-	cout << "NORMAL SIZE: " << normals.size() << "\n";
-	cout << "POINTS SIZE: " << points.size() << "\n";
+	//cout << "NORMAL SIZE: " << normals.size() << "\n";
+	//cout << "POINTS SIZE: " << points.size() << "\n";
 
 	//put the data on the VBO
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -111,13 +111,13 @@ void Polyhedron::textureInit(Texture t) {
 	int x = t.width;
 	int y = t.height;
 
-	cout << t.isLoaded() << endl;
+	//cout << t.isLoaded() << endl;
 	
 
 	if(!t.isLoaded()) {
 		t.setImage(ppmRead(t.name, &x, &y));
-		cout << "loading texture" << t.name << endl;
-		cout << t.isLoaded() << endl;
+		//cout << "loading texture" << t.name << endl;
+		//cout << t.isLoaded() << endl;
 	}
 
 	//GLubyte * image = ppmRead(t.name, &x, &y);
@@ -142,7 +142,7 @@ Polyhedron::~Polyhedron(){
 //----------------------------------------------------------------------------
 
 void Polyhedron::draw(Camera cam, vector<Light*> lights){
-	//Draw the Polyhedron body
+	//Draw the Polyhedron bod
 	glBindVertexArray(VAO);
 	glUseProgram(program);  //also switch to using this shader program
 	glUniformMatrix4fv(mmLoc, 1, GL_TRUE,modelmatrix);
