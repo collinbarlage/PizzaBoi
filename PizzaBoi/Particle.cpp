@@ -1,18 +1,26 @@
 #include "Particle.h"
 
 
-Particle::Particle(GLfloat x, GLfloat y, GLfloat z) {
+Particle::Particle(GLfloat x, GLfloat y, GLfloat z, bool black) {
 	speed = .1;
 	size = 200;
-	
-	for(int i=0; i<size; i++) {
-		mass.push_back(1);
-		positions.push_back(Translate(x,y,z)*vec4(2*((float)rand()/RAND_MAX)-1,2*((float)rand()/RAND_MAX)-1,2*((float)rand()/RAND_MAX)-1,1));
-		velocities.push_back(speed*vec4(2*((float)rand()/RAND_MAX)-1,2*((float)rand()/RAND_MAX)-1,2*((float)rand()/RAND_MAX)-1,0));
-		colors.push_back(getHouseColor());
+	if(black) {
+		for(int i=0; i<size; i++) {
+			mass.push_back(1);
+			positions.push_back(Translate(x,y,z)*vec4(2*((float)rand()/RAND_MAX)-1,2*((float)rand()/RAND_MAX)-1,2*((float)rand()/RAND_MAX)-1,1));
+			velocities.push_back(speed*vec4(2*((float)rand()/RAND_MAX)-1,2*((float)rand()/RAND_MAX)-1,2*((float)rand()/RAND_MAX)-1,0));
+			colors.push_back(vec4(0,0,0,1));
+		}
+	} else {
+		for(int i=0; i<size; i++) {
+			mass.push_back(1);
+			positions.push_back(Translate(x,y,z)*vec4(2*((float)rand()/RAND_MAX)-1,2*((float)rand()/RAND_MAX)-1,2*((float)rand()/RAND_MAX)-1,1));
+			velocities.push_back(speed*vec4(2*((float)rand()/RAND_MAX)-1,2*((float)rand()/RAND_MAX)-1,2*((float)rand()/RAND_MAX)-1,0));
+			colors.push_back(getHouseColor());
+		}
 	}
 	
-	//loadObj("./objects/boundCow.obj", .4);
+	//loadObj("./objects/boundCow.obj", .4);q
 }
 
 

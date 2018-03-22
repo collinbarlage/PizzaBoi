@@ -22,7 +22,7 @@ class Particle: public Drawable{
 
 public:
 	Particle(); 
-	Particle(GLfloat x, GLfloat y, GLfloat z); 
+	Particle(GLfloat x, GLfloat y, GLfloat z, bool b); 
 	~Particle();
 
 	void loadObj(string filename, float scale);

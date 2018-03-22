@@ -48,12 +48,14 @@ struct SpecialInput{
 void startGame(void);
 void die(void);
 void firePizza(vec4 at);
+void spawnMob(int t, vec4 at);
 
 //helper functions
 void toggleKey(unsigned char key, bool toggle);
 void toggleSpecialInput(int key, bool toggle);
 void animateKeys();
 void detectCollisions(int i);
+void detectMobCollisions(int i);
 
 //Objects
 Polyhedron* mbox;
@@ -73,9 +75,14 @@ int ammoIndex = 0;
 vector<Object*> ammo;
 vector<Object*> houses;
 
+//Mob
+int numMob;
+int mobIndex = 0;
+vector<Object*> mob;
+
 //Lights
 vector<Light*> lights;
-Light sun = Light(vec4(2,10,0,1),vec4(.8,.8,.6,1),vec4(1,1,1,1),vec4(.3,1,1,1));
+Light sun = Light(vec4(2,10,0,1),vec4(.7,.7,.5,1),vec4(1,1,1,1),vec4(.3,1,1,1));
 Light flashlight = Light(vec4(0,2,-2,1),vec4(.2,.1,.1,1),vec4(.3,.1,0,1),vec4(.5,.5,.1,1));
 float orbitTime = 0;
 
@@ -93,6 +100,7 @@ Texture tTiger = Texture("objects/lion.ppm", 1280, 720);
 Texture tCheeta = Texture("objects/cheeta.ppm", 1280, 720);
 
 //Helpers
+int t = 0; //time
 bool isAtMainMenu = true;
 bool stoneSelect = false;
 mat4 getCameraMatrix();
@@ -228,6 +236,7 @@ void init()
 	}
 
 	//Spawn Pizzas, Mama Mia
+	cout << "pizzas...";
 	srand(time(0));
 	for(int i=1; i<=10; i++) {
 		object = new Object();
@@ -236,26 +245,17 @@ void init()
 		ammo.push_back(object);
 	}
 
-	
+	//skullz
+	numMob = 20;
+	cout << "skullz...";
+	for(int i=0; i<numMob; i++) {
+		object = new Object();
+		object->makeSkull(0,-20,0);
+		drawables.push_back(object);
+		mob.push_back(object);
+	}
+	cout << "done" << endl;
 
-	//JUNGLE COWS
-	/*
-	mbox = new Polyhedron();
-	mbox->loadObj("objects/boundCow.obj", 2);
-	mbox->setModelMatrix(Translate(5,-1,-1)*RotateY(180));
-	mbox->textureInit(tTiger);
-	drawables.push_back(mbox);
-	mbox = new Polyhedron();
-	mbox->loadObj("objects/boundCow.obj", 2);
-	mbox->setModelMatrix(Translate(5,-1,0)*RotateY(180));
-	mbox->textureInit(tSnow);
-	drawables.push_back(mbox);
-	mbox = new Polyhedron();
-	mbox->loadObj("objects/boundCow.obj", 2);
-	mbox->setModelMatrix(Translate(5,-1,1)*RotateY(180));
-	mbox->textureInit(tCheeta);
-	drawables.push_back(mbox);
-	*/
 	//orbit sun
 	timerCallback(0);
 }
@@ -296,8 +296,14 @@ void firePizza(vec4 at) {
 }
 
 
-void makeCow() {
-
+void spawnMob(int t, vec4 at) {
+	float speed = .1; //1 is fast af, .1 is slowww
+	mob[mobIndex]->stopAnimation();
+	mob[mobIndex]->spawn(-at.x+50, -0.5,40*((float)rand()/RAND_MAX)-20);
+	mob[mobIndex]->setAnimation(vec3(-speed, 0, 0), 1);
+	mobIndex++;
+	if(mobIndex >= numMob) //only allow 10 pizzas on screen at once
+		mobIndex = 0;
 }
 
 void die() { //call when player dies
@@ -412,11 +418,21 @@ void timerCallback(int value) {
 		orbitTime = -3.1415926535;
 	sun.position = vec4(cos(orbitTime)*10, sin(orbitTime)*10, pos.z, 1);
 
+	//Spawn mob
+	if(t%50 == 0) { //spawn rate
+		spawnMob(t, cam1.at);
+	}
+
 	//Move projectiles
 	for(int i=0; i<ammo.size(); i++) {
 		ammo[i]->animate();
-
 		detectCollisions(i);
+	}
+
+	//Move mob
+	for(int i=0; i<numMob; i++) {
+		mob[i]->animate();
+		detectMobCollisions(i);
 	}
 
 	//move particles
@@ -427,13 +443,61 @@ void timerCallback(int value) {
 
 
 
-
+	t++; //incriment time
 	//continue animating...
 	glutTimerFunc(10, timerCallback, 0);
 	glutPostRedisplay();
 }
 
+void detectMobCollisions(int i) {
+	vec3 p1 = mob[i]->getLocation();
+	vec3 p2 = vec3(-cam1.at.x, cam1.at.y,-cam1.at.z);
+
+	vec3 houseSquare[] = { vec3(p2.x + 2, p2.y, p2.z + 1.5), vec3(p2.x - 2, p2.y, p2.z + 1.5), vec3(p2.x - 2, p2.y, p2.z - 1.5), vec3(p2.x + 2, p2.y, p2.z - 1.5) };
+	float distance = sqrt(pow((p2.x - p1.x), 2) + pow((p2.y - p1.y), 2) + pow((p2.z - p1.z), 2));
+
+	if (distance < 4) { //if its in the hitbox range
+		for (int k = 0; k < 4; k++) {
+			distance = sqrt(pow((houseSquare[k].x - p1.x), 2) + pow((houseSquare[k].y - p1.y), 2) + pow((houseSquare[k].z - p1.z), 2));
+
+			if (distance < 2) { //THIS IS WHERE IT FINALLY COLLIDES
+				cout << "UR DEAD" << endl;
+				die();
+			}
+		}
+	}
+}
+
+
 void detectCollisions(int i) {
+	//pizza->skull
+	for (int j = 0; j < numMob; j++) {
+		vec3 p1 = ammo[i]->getLocation();
+		vec3 p2 = mob[j]->getLocation();
+
+		vec3 houseSquare[] = { vec3(p2.x + 2, p2.y, p2.z + 1.5), vec3(p2.x - 2, p2.y, p2.z + 1.5), vec3(p2.x - 2, p2.y, p2.z - 1.5), vec3(p2.x + 2, p2.y, p2.z - 1.5) };
+		float distance = sqrt(pow((p2.x - p1.x), 2) + pow((p2.y - p1.y), 2) + pow((p2.z - p1.z), 2));
+
+		if (distance < 4) { //if its in the hitbox range
+			for (int k = 0; k < 4; k++) {
+				distance = sqrt(pow((houseSquare[k].x - p1.x), 2) + pow((houseSquare[k].y - p1.y), 2) + pow((houseSquare[k].z - p1.z), 2));
+
+				if (distance < 2) { //THIS IS WHERE IT FINALLY COLLIDES
+					cout << "BAM" << endl;
+					//make particlez
+					particle = new Particle(p1.x, p1.y, p1.z,true);
+					particle->init();
+					particles.push_back(particle);
+					drawables.push_back(particle);
+					//respawn geometry
+					mob[j]->spawn(0,-20,0);
+					ammo[i]->spawn(0, -5, 0);
+					ammo[i]->stopAnimation(); //stop previous animation if any
+				}
+			}
+		}
+	}
+	//pizza->houses
 	for (int j = 0; j < houses.size(); j++) {
 		vec3 p1 = ammo[i]->getLocation();
 		vec3 p2 = houses[j]->getLocation();
@@ -448,7 +512,7 @@ void detectCollisions(int i) {
 				if (distance < 2) { //THIS IS WHERE IT FINALLY COLLIDES
 					cout << "BAM" << endl;
 					//make particlez
-					particle = new Particle(p1.x, p1.y, p1.z);
+					particle = new Particle(p1.x, p1.y, p1.z,false);
 					particle->init();
 					particles.push_back(particle);
 					drawables.push_back(particle);

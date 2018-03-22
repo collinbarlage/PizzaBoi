@@ -77,6 +77,20 @@ void Object::stopAnimation() {
 	isAnimating = false;
 }
 
+void Object::makeSkull(GLfloat tX, GLfloat tY, GLfloat tZ) {
+	x = y = z = 0;
+	polyhedrons.clear();
+	float scale = .5;
+
+	poly = new Polyhedron();
+	poly->loadObj("./objects/lowPolySkull.obj", scale);
+	poly->init();
+	polyhedrons.push_back(poly);
+
+
+	translate(tX,tY,tZ);
+}
+
 void Object::makePizza(GLfloat tX, GLfloat tY, GLfloat tZ) {
 	x = y = z = 0;
 	polyhedrons.clear();
