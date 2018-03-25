@@ -106,7 +106,7 @@ bool stoneSelect = false;
 mat4 getCameraMatrix();
 vec4 getCameraEye();
 GLuint windowID=0;
-int numHouses;
+int housesLeft, numHouses; 
 
 //Put any keys here that you want to be animated when held down
 enum E_Keys {z=0, Z, xKey, X, c, C, a, s, d, w, KEYS_SIZE}; //make sure KEYS_SIZE is always last element in enum
@@ -246,7 +246,7 @@ void init()
 	}
 
 	//skullz
-	numMob = 40;
+	numMob = 55;
 	cout << "skullz...";
 	for(int i=0; i<numMob; i++) {
 		object = new Object();
@@ -270,6 +270,8 @@ void startGame() {
 	isAtMainMenu = false;
 	cam = &cam1;
 	drawables[0]->updateTexture(tDeath);
+	housesLeft = numHouses;
+	cout << housesLeft;
 
 	//set up mouse
 	glutPassiveMotionFunc(setViewByMouse);
@@ -296,9 +298,10 @@ void firePizza(vec4 at) {
 
 
 void spawnMob(int t, vec4 at) {
-	float speed = .1; //1 is fast af, .1 is slowww
+	
+	float speed = .1 + (float)t/10000; //1 is fast af, .1 is slowww
 	mob[mobIndex]->stopAnimation();
-	mob[mobIndex]->spawn(-at.x+50, -0.5,40*((float)rand()/RAND_MAX)-20);
+	mob[mobIndex]->spawn(-at.x+70, -0.5,40*((float)rand()/RAND_MAX)-20);
 	mob[mobIndex]->setAnimation(vec3(-speed, 0, 0), 1);
 	mobIndex++;
 	if(mobIndex >= numMob) //only allow 10 pizzas on screen at once
@@ -346,7 +349,7 @@ void resize(int w, int h) {
 }
 
 void click(int button, int state, int x, int y) {
-	srand(time(NULL));
+	//srand(glutGet(GLUT_ELAPSED_TIME)/time(NULL));
 
 	if(isAtMainMenu && state == 1 && x >440 && x < 889 && y > 443 && y < 690) {
 		//START GAME
@@ -407,7 +410,6 @@ void toggleSpecialInput(int key, bool toggle){
 //Timer  callback
 void timerCallback(int value) {
 	vec4 pos = sun.position;
-
 	animateKeys();
 
 	//Rotate sun
@@ -417,7 +419,7 @@ void timerCallback(int value) {
 	sun.position = vec4(cos(orbitTime)*10, sin(orbitTime)*10, pos.z, 1);
 
 	//Spawn mob
-	if(!isAtMainMenu && t%20 == 0) { //spawn rate
+	if(!isAtMainMenu && t%10 == 0) { //spawn rate
 		spawnMob(t, cam1.at);
 	}
 
@@ -481,27 +483,31 @@ void detectCollisions(int i) {
 		}
 	}
 	//pizza->houses
-	for (int j = 0; j < houses.size(); j++) {
-		vec3 p1 = ammo[i]->getLocation();
-		vec3 p2 = houses[j]->getLocation();
+	if(housesLeft > 0) {
+		for (int j = 0; j < houses.size(); j++) {
+			vec3 p1 = ammo[i]->getLocation();
+			vec3 p2 = houses[j]->getLocation();
 
-		vec3 houseSquare[] = { vec3(p2.x + 2, p2.y, p2.z + 1.5), vec3(p2.x - 2, p2.y, p2.z + 1.5), vec3(p2.x - 2, p2.y, p2.z - 1.5), vec3(p2.x + 2, p2.y, p2.z - 1.5) };
-		float distance = sqrt(pow((p2.x - p1.x), 2) + pow((p2.y - p1.y), 2) + pow((p2.z - p1.z), 2));
+			vec3 houseSquare[] = { vec3(p2.x + 2, p2.y, p2.z + 1.5), vec3(p2.x - 2, p2.y, p2.z + 1.5), 
+								   vec3(p2.x - 2, p2.y, p2.z - 1.5), vec3(p2.x + 2, p2.y, p2.z - 1.5) };
+			float distance = sqrt(pow((p2.x - p1.x), 2) + pow((p2.y - p1.y), 2) + pow((p2.z - p1.z), 2));
 
-		if (distance < 4) { //if its in the hitbox range
-			for (int k = 0; k < 4; k++) {
-				distance = sqrt(pow((houseSquare[k].x - p1.x), 2) + pow((houseSquare[k].y - p1.y), 2) + pow((houseSquare[k].z - p1.z), 2));
+			if (distance < 4) { //if its in the hitbox range
+				for (int k = 0; k < 4; k++) {
+					distance = sqrt(pow((houseSquare[k].x - p1.x), 2) + pow((houseSquare[k].y - p1.y), 2) + pow((houseSquare[k].z - p1.z), 2));
 
-				if (distance < 2) { //THIS IS WHERE IT FINALLY COLLIDES
-					//make particlez
-					particle = new Particle(p1.x, p1.y, p1.z,false);
-					particle->init();
-					particles.push_back(particle);
-					drawables.push_back(particle);
-					//respawn geometry
-					houses[j]->spawn(0,-5,0);
-					ammo[i]->spawn(0, -5, 0);
-					ammo[i]->stopAnimation(); //stop previous animation if any
+					if (distance < 2) { //THIS IS WHERE IT FINALLY COLLIDES
+						housesLeft--;
+						//make particlez
+						particle = new Particle(p1.x, p1.y, p1.z,false);
+						particle->init();
+						particles.push_back(particle);
+						drawables.push_back(particle);
+						//respawn geometry
+						houses[j]->spawn(0,-5,0);
+						ammo[i]->spawn(0, -5, 0);
+						ammo[i]->stopAnimation(); //stop previous animation if any
+					}
 				}
 			}
 		}

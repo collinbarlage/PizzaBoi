@@ -6,10 +6,15 @@ Particle::Particle(GLfloat x, GLfloat y, GLfloat z, bool black) {
 	size = 200;
 	if(black) {
 		for(int i=0; i<size; i++) {
+			float greyscale = (float)rand()/RAND_MAX;
 			mass.push_back(1);
 			positions.push_back(Translate(x,y,z)*vec4(((float)rand()/RAND_MAX)-.5,((float)rand()/RAND_MAX)-.5,((float)rand()/RAND_MAX)-.5,1));
 			velocities.push_back(speed*vec4(2*((float)rand()/RAND_MAX)-1,2*((float)rand()/RAND_MAX)-1,2*((float)rand()/RAND_MAX)-1,0));
-			colors.push_back(vec4(0,0,0,1));
+			if(greyscale < .95) { //5% blood
+				colors.push_back(vec4(greyscale,greyscale,greyscale,1));
+			} else {
+				colors.push_back(vec4(1,0,0,1)); //red
+			}
 		}
 	} else {
 		for(int i=0; i<size; i++) {
